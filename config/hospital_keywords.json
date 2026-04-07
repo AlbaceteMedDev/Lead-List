@@ -105,7 +105,19 @@
     "Dana-Farber",
     "Lahey Hospital",
     "Cleveland Clinic",
-    "Mayo Clinic"
+    "Mayo Clinic",
+    "Adirondack Health",
+    "AdventHealth",
+    "Adventist Healthcare",
+    "Adventist Physician Services",
+    "AHN ",
+    "Allegheny Health",
+    "Ascension Medical Group",
+    "Ascension Saint",
+    "Ascension St.",
+    "Spectrum Health",
+    "Trinity Health",
+    "Cooper Green Mercy Health"
   ],
   "generic_patterns": [
     "hospital",
