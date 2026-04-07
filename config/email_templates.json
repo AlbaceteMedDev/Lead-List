@@ -1,0 +1,42 @@
+{
+  "sender": {
+    "name": "Gabe Albacete",
+    "title": "Owner, Albacete MedDev",
+    "email": "gabe@albacetemeddev.com"
+  },
+  "track_a": {
+    "name": "ProPacks Only",
+    "subject": "Post-op incision care for {practice_name}",
+    "body": "Dr. {last_name},\n\n{volume_hook}, I wanted to reach out about a solution that's helping orthopedic practices like {practice_name} improve post-op incision outcomes while saving time and increasing per-case profitability.\n\nProPacks are standardized post-operative incision care kits designed specifically for {procedure_focus} patients. Surgeons using ProPacks report:\n\n- Better, more predictable patient outcomes with standardized wound care protocols\n- Reduced physician time spent on post-op wound management\n- Full compliance and audit protection with documented care pathways\n- Increased per-case profitability through bundled incision care\n\nI'd love to set up a quick lunch & learn at {practice_name} in {city} to walk through how ProPacks could fit into your current post-op protocol — or if easier, a brief intro call works too.\n\nWould any day next week work for a 15-minute conversation?\n\nBest regards,\n{sender_name}\n{sender_title}\n{sender_email}"
+  },
+  "track_b": {
+    "name": "ProPacks + Microlyte SAM",
+    "subject": "Post-op incision innovation for {practice_name}",
+    "body": "Dr. {last_name},\n\n{volume_hook}, I wanted to introduce two innovations that are transforming post-op care for orthopedic practices like {practice_name}.\n\nFirst, ProPacks — standardized post-operative incision care kits for {procedure_focus} patients that deliver:\n\n- Better, more predictable patient outcomes\n- Reduced physician time on post-op wound management\n- Full compliance and audit protection\n- Increased per-case profitability\n\nSecond, Microlyte SAM — an advanced antimicrobial wound matrix that's a game-changer for complex wound management:\n\n- 99.99% microbial reduction sustained for 72+ hours (ionic and metallic silver)\n- Fully synthetic and bioresorbable — no painful removal required\n- Simple \"peel and place\" application that integrates seamlessly into existing workflows\n- HCPCS A2005 — reimbursable on Day 1 in your MAC jurisdiction with no 30-day conservative care failure requirement\n\nI'd love to set up a lunch & learn at {practice_name} in {city} to demonstrate both products — or if easier, a quick intro call to start.\n\nWould any day next week work for 15 minutes?\n\nBest regards,\n{sender_name}\n{sender_title}\n{sender_email}"
+  },
+  "free_email_domains": [
+    "gmail.com", "yahoo.com", "hotmail.com", "aol.com", "outlook.com",
+    "icloud.com", "mail.com", "protonmail.com", "zoho.com", "yandex.com",
+    "gmx.com", "live.com", "msn.com", "comcast.net", "verizon.net",
+    "att.net", "sbcglobal.net", "bellsouth.net", "cox.net", "charter.net",
+    "earthlink.net", "optonline.net", "me.com", "mac.com"
+  ],
+  "hospital_email_domains": [
+    "atlantichealth.org", "rwjbh.org", "hackensackmeridian.org",
+    "nyu.edu", "nyulangone.org", "mountsinai.org", "northwell.edu",
+    "hss.edu", "montefiore.org", "nyp.org", "columbia.edu",
+    "cornellmedicine.org", "stonybrookmedicine.edu", "pennmedicine.upenn.edu",
+    "jefferson.edu", "geisinger.edu", "upmc.edu", "ynhh.org",
+    "hartfordhealthcare.org", "nuvancehealth.org", "medstar.net",
+    "jhmi.edu", "umm.edu", "virtua.org", "cooperhealth.org",
+    "saintpetersuh.com", "capitalhealth.org", "centrastate.com",
+    "greenwichhospital.org", "stamhealth.org", "wellspan.org",
+    "lvhn.org", "slhn.org", "bfrh.com", "valleyhealth.com",
+    "holynamemedical.org", "englewoodhealth.org"
+  ],
+  "generic_email_prefixes": [
+    "info", "office", "admin", "contact", "billing", "reception",
+    "appointments", "scheduling", "frontdesk", "help", "support",
+    "mail", "general", "hello"
+  ]
+}
