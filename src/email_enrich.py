@@ -124,8 +124,10 @@ def _detect_email_pattern(email: str, first: str, last: str) -> str | None:
     return None
 
 
-def _generate_email(pattern: str, first: str, last: str, domain: str) -> str:
+def _generate_email(pattern: str, first, last, domain: str) -> str:
     """Generate an email address from a detected pattern."""
+    if not first or not isinstance(first, str) or not last or not isinstance(last, str):
+        return None
     first_l = first.lower()
     last_l = last.lower()
 

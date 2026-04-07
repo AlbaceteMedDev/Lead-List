@@ -58,7 +58,7 @@ def assign_tiers(
             return TIER_HOSPITAL
 
         postal = row.get("Postal Code")
-        if not postal:
+        if not postal or not isinstance(postal, str) or postal.strip() in ("", "nan", "None"):
             logger.warning(f"NPI {row.get('HCP NPI')}: no postal code, defaulting to {TIER_DEFAULT}")
             return TIER_DEFAULT
 

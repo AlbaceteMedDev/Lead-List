@@ -18,7 +18,7 @@ def load_keywords(config_path: str = DEFAULT_CONFIG) -> dict:
 
 def is_hospital_based(site_of_care: str | None, keywords: dict) -> bool:
     """Determine if a site of care is hospital-based using keyword matching."""
-    if not site_of_care:
+    if not site_of_care or not isinstance(site_of_care, str):
         return False
 
     site_lower = site_of_care.lower().strip()
