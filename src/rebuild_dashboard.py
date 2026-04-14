@@ -182,7 +182,7 @@ def draw_mini_table_pct(ws, start_row, start_col, headers, values, pct_indices):
 
 def build_portfolio_section(ws, start_row, portfolio_name, color_fill,
                             call_tab, email_tab, total_range, vol_col, vol_label,
-                            accent_font):
+                            accent_font, collagen_stats=None):
     """Build a complete portfolio section: banner + KPIs + mini-tables."""
     row = start_row
 
@@ -272,21 +272,33 @@ def build_portfolio_section(ws, start_row, portfolio_name, color_fill,
                         pct_indices=[4, 5])
     row += 3
 
-    # ---- COLLAGEN USAGE ----
-    draw_subsection_header(ws, row, "  Collagen Usage")
+    # ---- COLLAGEN USAGE (uses cached values since it's static AcuityMD data) ----
+    draw_subsection_header(ws, row, "  🧬 Collagen Usage (Existing Wound-Care Product Buyers)")
     row += 1
+    cs = collagen_stats or {}
+    # Big summary cards — use direct cached values so they show immediately
+    draw_kpi_card(ws, row, 1, 3, "LEADS USING COLLAGEN (ANY TYPE)",
+                  cs.get("any_collagen_users", 0), KPI_VALUE_FONT_MD)
+    draw_kpi_card(ws, row, 4, 6, "TOTAL LG SHEET VOL",
+                  cs.get("lg_total", 0), KPI_VALUE_FONT_MD)
+    draw_kpi_card(ws, row, 7, 9, "TOTAL SM/MD SHEET VOL",
+                  cs.get("smmd_total", 0), KPI_VALUE_FONT_MD)
+    draw_kpi_card(ws, row, 10, 12, "TOTAL COLLAGEN POWDER VOL",
+                  cs.get("pwd_total", 0), KPI_VALUE_FONT_MD)
+    row += 3
     draw_mini_table(ws, row, 1,
-                    ["Leads w/ Collagen", "Avg Lg Sheet", "Avg Sm/Md Sheet",
-                     "Avg Powder", "Total Lg Sheet", "Total Sm/Md", "Total Powder", "Max Lg Sheet"],
+                    ["Lg Sheet Users", "Sm/Md Sheet Users", "Powder Users",
+                     "Avg Lg Sheet", "Avg Sm/Md Sheet", "Avg Powder",
+                     "Max Lg Sheet", "Max Sm/Md"],
                     [
-                        f"=COUNTIF('{t}'!R2:R{tr},\">0\")+COUNTIF('{t}'!S2:S{tr},\">0\")+COUNTIF('{t}'!T2:T{tr},\">0\")",
-                        f"=IFERROR(ROUND(AVERAGEIF('{t}'!R2:R{tr},\">0\"),0),0)",
-                        f"=IFERROR(ROUND(AVERAGEIF('{t}'!S2:S{tr},\">0\"),0),0)",
-                        f"=IFERROR(ROUND(AVERAGEIF('{t}'!T2:T{tr},\">0\"),0),0)",
-                        f"=IFERROR(SUM('{t}'!R2:R{tr}),0)",
-                        f"=IFERROR(SUM('{t}'!S2:S{tr}),0)",
-                        f"=IFERROR(SUM('{t}'!T2:T{tr}),0)",
-                        f"=IFERROR(MAX('{t}'!R2:R{tr}),0)",
+                        cs.get("lg_users", 0),
+                        cs.get("smmd_users", 0),
+                        cs.get("pwd_users", 0),
+                        cs.get("lg_avg", 0),
+                        cs.get("smmd_avg", 0),
+                        cs.get("pwd_avg", 0),
+                        cs.get("lg_max", 0),
+                        cs.get("smmd_max", 0),
                     ])
     row += 3
 
@@ -315,8 +327,61 @@ def build_portfolio_section(ws, start_row, portfolio_name, color_fill,
 # MAIN
 # ============================================================
 
+def compute_stats(input_file):
+    """Pre-compute statistics from each tracker tab for caching in Dashboard."""
+    import pandas as pd
+    import openpyxl as ox
+
+    def safe_int(v):
+        if v is None or pd.isna(v):
+            return 0
+        try:
+            return int(v)
+        except (ValueError, TypeError):
+            return 0
+
+    wb = ox.load_workbook(input_file, read_only=True)
+    stats = {}
+    for tab in ["Call Tracker - JR", "Call Tracker - S&N", "Call Tracker - OOS"]:
+        ws = wb[tab]
+        headers = [c.value for c in list(ws.iter_rows(max_row=1))[0]]
+        rows = list(ws.iter_rows(min_row=2, values_only=True))
+        df = pd.DataFrame(rows, columns=headers)
+        for col in ["Lg Collagen Vol", "Sm/Md Collagen Vol", "Collagen Powder Vol"]:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        lg_pos = df[df["Lg Collagen Vol"] > 0]["Lg Collagen Vol"]
+        smmd_pos = df[df["Sm/Md Collagen Vol"] > 0]["Sm/Md Collagen Vol"]
+        pwd_pos = df[df["Collagen Powder Vol"] > 0]["Collagen Powder Vol"]
+        stats[tab] = {
+            "lg_users": int((df["Lg Collagen Vol"] > 0).sum()),
+            "smmd_users": int((df["Sm/Md Collagen Vol"] > 0).sum()),
+            "pwd_users": int((df["Collagen Powder Vol"] > 0).sum()),
+            "lg_total": safe_int(df["Lg Collagen Vol"].sum()),
+            "smmd_total": safe_int(df["Sm/Md Collagen Vol"].sum()),
+            "pwd_total": safe_int(df["Collagen Powder Vol"].sum()),
+            "lg_avg": safe_int(lg_pos.mean() if len(lg_pos) else 0),
+            "smmd_avg": safe_int(smmd_pos.mean() if len(smmd_pos) else 0),
+            "pwd_avg": safe_int(pwd_pos.mean() if len(pwd_pos) else 0),
+            "lg_max": safe_int(df["Lg Collagen Vol"].max()),
+            "smmd_max": safe_int(df["Sm/Md Collagen Vol"].max()),
+            "any_collagen_users": int((
+                (df["Lg Collagen Vol"] > 0) |
+                (df["Sm/Md Collagen Vol"] > 0) |
+                (df["Collagen Powder Vol"] > 0)
+            ).sum()),
+        }
+        logger.info(f"  {tab} collagen: {stats[tab]['any_collagen_users']} users, "
+                    f"Lg total={stats[tab]['lg_total']}, Sm/Md total={stats[tab]['smmd_total']}, "
+                    f"Pwd total={stats[tab]['pwd_total']}")
+    wb.close()
+    return stats
+
+
 def main():
     input_file = "Master_Lead_List_Tracker (3).xlsx"
+
+    logger.info("Pre-computing stats for cached values...")
+    stats = compute_stats(input_file)
 
     logger.info("Loading workbook...")
     wb = openpyxl.load_workbook(input_file)
@@ -324,6 +389,10 @@ def main():
     # Strip external links
     if hasattr(wb, "_external_links"):
         wb._external_links = []
+
+    # Force Excel to fully recalculate all formulas when the file opens
+    wb.calculation.calcMode = "auto"
+    wb.calculation.fullCalcOnLoad = True
 
     # Remove old Dashboard
     if "Dashboard" in wb.sheetnames:
@@ -399,6 +468,7 @@ def main():
         ws, row, "JOINT REPLACEMENT — JR",
         JR_BANNER_FILL, "Call Tracker - JR", "Email Tracker - JR",
         "4442", "Q", "Avg Joint Vol", KPI_VALUE_FONT_ACCENT_JR,
+        collagen_stats=stats.get("Call Tracker - JR"),
     )
 
     # === S&N PORTFOLIO ===
@@ -407,6 +477,7 @@ def main():
         ws, row, "SPINE & NEURO — S&N",
         SN_BANNER_FILL, "Call Tracker - S&N", "Email Tracker - S&N",
         "10001", "Q", "Avg Spine Vol", KPI_VALUE_FONT_ACCENT_SN,
+        collagen_stats=stats.get("Call Tracker - S&N"),
     )
 
     # === OOS PORTFOLIO ===
@@ -415,6 +486,7 @@ def main():
         ws, row, "OUTSIDE ORTHO & SPINE — OOS",
         OOS_BANNER_FILL, "Call Tracker - OOS", "Email Tracker - OOS",
         "10001", "Q", "Avg Proc Vol", KPI_VALUE_FONT_ACCENT_OOS,
+        collagen_stats=stats.get("Call Tracker - OOS"),
     )
 
     # === READING GUIDE ===
