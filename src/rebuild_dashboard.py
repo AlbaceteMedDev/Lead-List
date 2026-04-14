@@ -135,8 +135,8 @@ def build_call_totals_block(ws, row, title, section_fill, tab, total_range):
 
     t = tab
     tr = total_range
-    # Call outcome columns: S, V, Y, AB, AE (for Call 1-5 Outcome)
-    outcome_cols = ["S", "V", "Y", "AB", "AE"]
+    # Call outcome columns: W, Z, AC, AF, AI (shifted +4 after collagen/incision insertion)
+    outcome_cols = ["W", "Z", "AC", "AF", "AI"]
     counta_parts = [f"COUNTA('{t}'!{c}2:{c}{tr})" for c in outcome_cols]
     total_calls_formula = "=" + "+".join(counta_parts)
 
@@ -197,6 +197,59 @@ def build_email_totals_block(ws, row, title, section_fill, tab, total_range):
         f"=IFERROR(B{data_row}/A{data_row},0)",
         f"=IFERROR(C{data_row}/A{data_row},0)",
     ], pct_cols=[9, 10])
+    return row + 2
+
+
+def build_collagen_block(ws, row, title, section_fill, tab, total_range):
+    """Build collagen volume averages + totals block."""
+    write_section_header(ws, row, title, section_fill)
+    row += 1
+    write_subheader_row(ws, row, [
+        "Leads w/ Collagen Use", "Avg Lg Collagen", "Avg Sm/Md Collagen",
+        "Avg Collagen Powder", "Total Lg Collagen", "Total Sm/Md Collagen",
+        "Total Collagen Powder", "Max Lg Collagen", "", "",
+    ])
+    row += 1
+    t = tab
+    tr = total_range
+    # Columns: R = Lg Collagen, S = Sm/Md Collagen, T = Collagen Powder
+    write_data_row(ws, row, [
+        f"=COUNTIF('{t}'!R2:R{tr},\">0\")+COUNTIF('{t}'!S2:S{tr},\">0\")+COUNTIF('{t}'!T2:T{tr},\">0\")",
+        f"=IFERROR(ROUND(AVERAGEIF('{t}'!R2:R{tr},\">0\"),0),0)",
+        f"=IFERROR(ROUND(AVERAGEIF('{t}'!S2:S{tr},\">0\"),0),0)",
+        f"=IFERROR(ROUND(AVERAGEIF('{t}'!T2:T{tr},\">0\"),0),0)",
+        f"=IFERROR(SUM('{t}'!R2:R{tr}),0)",
+        f"=IFERROR(SUM('{t}'!S2:S{tr}),0)",
+        f"=IFERROR(SUM('{t}'!T2:T{tr}),0)",
+        f"=IFERROR(MAX('{t}'!R2:R{tr}),0)",
+        "", "",
+    ])
+    return row + 2
+
+
+def build_incision_block(ws, row, title, section_fill, tab, total_range):
+    """Build incision likelihood distribution block."""
+    write_section_header(ws, row, title, section_fill)
+    row += 1
+    write_subheader_row(ws, row, [
+        "High", "Medium-High", "Medium", "Low", "Unlikely",
+        "% High/Med-High", "High + Med-High Count", "", "", "",
+    ])
+    row += 1
+    t = tab
+    tr = total_range
+    # Column U = Lg Incision Likelihood
+    data_row = row
+    write_data_row(ws, data_row, [
+        f'=COUNTIF(\'{t}\'!U2:U{tr},"High")',
+        f'=COUNTIF(\'{t}\'!U2:U{tr},"Medium-High")',
+        f'=COUNTIF(\'{t}\'!U2:U{tr},"Medium")',
+        f'=COUNTIF(\'{t}\'!U2:U{tr},"Low")',
+        f'=COUNTIF(\'{t}\'!U2:U{tr},"Unlikely")',
+        f"=IFERROR((A{data_row}+B{data_row})/COUNTA('{t}'!U2:U{tr}),0)",
+        f"=A{data_row}+B{data_row}",
+        "", "", "",
+    ], pct_cols=[6])
     return row + 2
 
 
@@ -274,6 +327,10 @@ def main():
     # ========== JR ==========
     row = build_portfolio_block(ws, row, "JOINT REPLACEMENT PORTFOLIO",
                                 JR_SECTION_FILL, "Call Tracker - JR", "4442", "Q", "Avg Joint Vol")
+    row = build_collagen_block(ws, row, "JR — COLLAGEN USAGE",
+                               JR_SECTION_FILL, "Call Tracker - JR", "4442")
+    row = build_incision_block(ws, row, "JR — INCISION LIKELIHOOD",
+                               JR_SECTION_FILL, "Call Tracker - JR", "4442")
     row = build_pipeline_block(ws, row, "JR — PIPELINE STATUS",
                                JR_SECTION_FILL, "Call Tracker - JR", "4442")
     row = build_call_totals_block(ws, row, "JR — CALL TOTALS",
@@ -300,6 +357,11 @@ def main():
                                     "Specialist": "Specialist",
                                 }, "Q", "Avg Spine Vol")
 
+    row = build_collagen_block(ws, row, "S&N — COLLAGEN USAGE",
+                               SN_SECTION_FILL, "Call Tracker - S&N", "10001")
+    row = build_incision_block(ws, row, "S&N — INCISION LIKELIHOOD",
+                               SN_SECTION_FILL, "Call Tracker - S&N", "10001")
+
     row = build_pipeline_block(ws, row, "S&N — PIPELINE STATUS",
                                SN_SECTION_FILL, "Call Tracker - S&N", "10001")
     row = build_call_totals_block(ws, row, "S&N — CALL TOTALS",
@@ -325,6 +387,11 @@ def main():
                                     "GynOnc": "Obstetrics & Gynecology > Gynecologic Oncology",
                                     "Mohs": "Dermatology > MOHS-Micrographic Surgery",
                                 }, "Q", "Avg Proc Vol")
+
+    row = build_collagen_block(ws, row, "OOS — COLLAGEN USAGE",
+                               OOS_SECTION_FILL, "Call Tracker - OOS", "10001")
+    row = build_incision_block(ws, row, "OOS — INCISION LIKELIHOOD",
+                               OOS_SECTION_FILL, "Call Tracker - OOS", "10001")
 
     row = build_pipeline_block(ws, row, "OOS — PIPELINE STATUS",
                                OOS_SECTION_FILL, "Call Tracker - OOS", "10001")
