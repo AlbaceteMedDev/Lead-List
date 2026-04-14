@@ -53,6 +53,7 @@ TEAL_BANNER_FILL = PatternFill(start_color=TEAL, end_color=TEAL, fill_type="soli
 CARD_FILL = PatternFill(start_color=LIGHT_GRAY_BG, end_color=LIGHT_GRAY_BG, fill_type="solid")
 TABLE_HEADER_FILL = PatternFill(start_color=DARK_GRAY, end_color=DARK_GRAY, fill_type="solid")
 TABLE_ROW_FILL = PatternFill(start_color=WHITE, end_color=WHITE, fill_type="solid")
+WHITE_FILL_PATT = PatternFill(start_color=WHITE, end_color=WHITE, fill_type="solid")
 TABLE_ALT_FILL = PatternFill(start_color="FAFAFA", end_color="FAFAFA", fill_type="solid")
 
 # Borders
@@ -439,29 +440,155 @@ def main():
     draw_kpi_card(ws, row, 10, 12, "MICROLYTE ELIGIBLE", total_elig_f, KPI_VALUE_FONT_LG)
     row += 3
 
-    # Portfolio comparison mini-table
-    draw_subsection_header(ws, row, "  Portfolio Breakdown")
+    # ===== SIDE-BY-SIDE PORTFOLIO COMPARISON TABLE =====
+    draw_subsection_header(ws, row, "  📋 Side-by-Side Comparison — JR vs S&N vs OOS")
     row += 1
-    draw_mini_table(ws, row, 1,
-                    ["Joint Replacement", "Spine & Neuro", "Outside Ortho",
-                     "JR Pvt Pract", "S&N Pvt Pract", "OOS Pvt Pract",
-                     "JR Microlyte", "S&N Microlyte", "OOS Microlyte",
-                     "JR Hospital", "S&N Hospital", "OOS Hospital"],
-                    [
-                        "=COUNTA('Call Tracker - JR'!A2:A4442)",
-                        "=COUNTA('Call Tracker - S&N'!A2:A10001)",
-                        "=COUNTA('Call Tracker - OOS'!A2:A10001)",
-                        "=COUNTIF('Call Tracker - JR'!K2:K4442,\"Private*\")",
-                        "=COUNTIF('Call Tracker - S&N'!K2:K10001,\"Private*\")",
-                        "=COUNTIF('Call Tracker - OOS'!K2:K10001,\"Private*\")",
-                        "=COUNTIF('Call Tracker - JR'!P2:P4442,\"Yes\")",
-                        "=COUNTIF('Call Tracker - S&N'!P2:P10001,\"Yes\")",
-                        "=COUNTIF('Call Tracker - OOS'!P2:P10001,\"Yes\")",
-                        "=COUNTIF('Call Tracker - JR'!K2:K4442,\"Hospital*\")",
-                        "=COUNTIF('Call Tracker - S&N'!K2:K10001,\"Hospital*\")",
-                        "=COUNTIF('Call Tracker - OOS'!K2:K10001,\"Hospital*\")",
-                    ])
-    row += 4
+
+    # Column headers: metric + JR + S&N + OOS
+    compare_headers = ["Metric", "JR (Joint Repl)", "S&N (Spine & Neuro)", "OOS (Outside Ortho)"]
+    # We'll use cols 1-4 for this wider comparison; fill remaining cols with empty
+    for i, h in enumerate(compare_headers, 1):
+        cell = ws.cell(row=row, column=i, value=h)
+        cell.font = TABLE_HEADER_FONT
+        cell.fill = TABLE_HEADER_FILL
+        cell.alignment = CENTER
+        cell.border = TABLE_BORDER
+    # Merge the extra columns for a wider right-hand area (use cols 1,2,3,4 + optional notes)
+    ws.row_dimensions[row].height = 26
+    row += 1
+
+    def compare_row(label, jr_val, sn_val, oos_val, is_pct=False):
+        nonlocal row
+        # Label
+        cell = ws.cell(row=row, column=1, value=label)
+        cell.font = Font(name="Calibri", size=10, bold=True, color=DARK_GRAY)
+        cell.alignment = Alignment(horizontal="left", vertical="center", indent=1)
+        cell.fill = TABLE_ALT_FILL
+        cell.border = TABLE_BORDER
+        # Values
+        for col, v, color in [(2, jr_val, JR_COLOR), (3, sn_val, SN_COLOR), (4, oos_val, OOS_COLOR)]:
+            cell = ws.cell(row=row, column=col, value=v)
+            cell.font = Font(name="Calibri", size=11, bold=True, color=color)
+            cell.alignment = CENTER
+            cell.fill = TABLE_ROW_FILL
+            cell.border = TABLE_BORDER
+            cell.number_format = "0.0%" if is_pct else "#,##0"
+        # Merge cols 5-12 as empty visual space
+        for col in range(5, 13):
+            ws.cell(row=row, column=col).border = None
+            ws.cell(row=row, column=col).fill = WHITE_FILL_PATT
+        ws.row_dimensions[row].height = 22
+        row += 1
+
+    # Widen cols 2-4 so comparison values breathe
+    ws.column_dimensions["A"].width = 34
+    ws.column_dimensions["B"].width = 22
+    ws.column_dimensions["C"].width = 22
+    ws.column_dimensions["D"].width = 22
+
+    jr_stats = stats.get("Call Tracker - JR", {})
+    sn_stats = stats.get("Call Tracker - S&N", {})
+    oos_stats = stats.get("Call Tracker - OOS", {})
+
+    # Portfolio size
+    compare_row("Total Leads",
+                "=COUNTA('Call Tracker - JR'!A2:A4442)",
+                "=COUNTA('Call Tracker - S&N'!A2:A10001)",
+                "=COUNTA('Call Tracker - OOS'!A2:A10001)")
+    compare_row("Private Practice",
+                "=COUNTIF('Call Tracker - JR'!K2:K4442,\"Private*\")",
+                "=COUNTIF('Call Tracker - S&N'!K2:K10001,\"Private*\")",
+                "=COUNTIF('Call Tracker - OOS'!K2:K10001,\"Private*\")")
+    compare_row("Hospital-Based",
+                "=COUNTIF('Call Tracker - JR'!K2:K4442,\"Hospital*\")",
+                "=COUNTIF('Call Tracker - S&N'!K2:K10001,\"Hospital*\")",
+                "=COUNTIF('Call Tracker - OOS'!K2:K10001,\"Hospital*\")")
+    compare_row("Microlyte Eligible (non-LCD states)",
+                "=COUNTIF('Call Tracker - JR'!P2:P4442,\"Yes\")",
+                "=COUNTIF('Call Tracker - S&N'!P2:P10001,\"Yes\")",
+                "=COUNTIF('Call Tracker - OOS'!P2:P10001,\"Yes\")")
+    compare_row("Tier 1 (0–30 min from NYC)",
+                "=COUNTIF('Call Tracker - JR'!L2:L4442,\"Tier 1*\")",
+                "=COUNTIF('Call Tracker - S&N'!L2:L10001,\"Tier 1*\")",
+                "=COUNTIF('Call Tracker - OOS'!L2:L10001,\"Tier 1*\")")
+    compare_row("Tier 2 (30–60 min)",
+                "=COUNTIF('Call Tracker - JR'!L2:L4442,\"Tier 2*\")",
+                "=COUNTIF('Call Tracker - S&N'!L2:L10001,\"Tier 2*\")",
+                "=COUNTIF('Call Tracker - OOS'!L2:L10001,\"Tier 2*\")")
+
+    # Divider row
+    ws.row_dimensions[row].height = 8
+    row += 1
+    # Sub-header for collagen
+    for i in range(1, 5):
+        cell = ws.cell(row=row, column=i)
+        cell.fill = PatternFill(start_color=MED_GRAY_BG, end_color=MED_GRAY_BG, fill_type="solid")
+        cell.border = TABLE_BORDER
+    ws.cell(row=row, column=1, value="  🧬 COLLAGEN USAGE").font = Font(name="Calibri", size=10, bold=True, color=DARK_GRAY)
+    ws.cell(row=row, column=1).alignment = Alignment(horizontal="left", vertical="center", indent=1)
+    ws.row_dimensions[row].height = 22
+    row += 1
+
+    compare_row("Leads Using Any Collagen",
+                jr_stats.get("any_collagen_users", 0),
+                sn_stats.get("any_collagen_users", 0),
+                oos_stats.get("any_collagen_users", 0))
+    compare_row("Total Lg Sheet Volume",
+                jr_stats.get("lg_total", 0),
+                sn_stats.get("lg_total", 0),
+                oos_stats.get("lg_total", 0))
+    compare_row("Total Sm/Md Sheet Volume",
+                jr_stats.get("smmd_total", 0),
+                sn_stats.get("smmd_total", 0),
+                oos_stats.get("smmd_total", 0))
+    compare_row("Total Powder Volume",
+                jr_stats.get("pwd_total", 0),
+                sn_stats.get("pwd_total", 0),
+                oos_stats.get("pwd_total", 0))
+    compare_row("Avg Lg Sheet (where > 0)",
+                jr_stats.get("lg_avg", 0),
+                sn_stats.get("lg_avg", 0),
+                oos_stats.get("lg_avg", 0))
+    compare_row("Max Lg Sheet Volume (top user)",
+                jr_stats.get("lg_max", 0),
+                sn_stats.get("lg_max", 0),
+                oos_stats.get("lg_max", 0))
+
+    # Divider row
+    ws.row_dimensions[row].height = 8
+    row += 1
+    # Sub-header for incision
+    for i in range(1, 5):
+        cell = ws.cell(row=row, column=i)
+        cell.fill = PatternFill(start_color=MED_GRAY_BG, end_color=MED_GRAY_BG, fill_type="solid")
+        cell.border = TABLE_BORDER
+    ws.cell(row=row, column=1, value="  🔪 INCISION LIKELIHOOD (Large Incision Targets)").font = Font(name="Calibri", size=10, bold=True, color=DARK_GRAY)
+    ws.cell(row=row, column=1).alignment = Alignment(horizontal="left", vertical="center", indent=1)
+    ws.row_dimensions[row].height = 22
+    row += 1
+
+    compare_row("High Incision Likelihood",
+                "=COUNTIF('Call Tracker - JR'!U2:U4442,\"High\")",
+                "=COUNTIF('Call Tracker - S&N'!U2:U10001,\"High\")",
+                "=COUNTIF('Call Tracker - OOS'!U2:U10001,\"High\")")
+    compare_row("Medium-High Incision",
+                "=COUNTIF('Call Tracker - JR'!U2:U4442,\"Medium-High\")",
+                "=COUNTIF('Call Tracker - S&N'!U2:U10001,\"Medium-High\")",
+                "=COUNTIF('Call Tracker - OOS'!U2:U10001,\"Medium-High\")")
+    compare_row("Medium",
+                "=COUNTIF('Call Tracker - JR'!U2:U4442,\"Medium\")",
+                "=COUNTIF('Call Tracker - S&N'!U2:U10001,\"Medium\")",
+                "=COUNTIF('Call Tracker - OOS'!U2:U10001,\"Medium\")")
+    compare_row("Low",
+                "=COUNTIF('Call Tracker - JR'!U2:U4442,\"Low\")",
+                "=COUNTIF('Call Tracker - S&N'!U2:U10001,\"Low\")",
+                "=COUNTIF('Call Tracker - OOS'!U2:U10001,\"Low\")")
+    compare_row("Unlikely",
+                "=COUNTIF('Call Tracker - JR'!U2:U4442,\"Unlikely\")",
+                "=COUNTIF('Call Tracker - S&N'!U2:U10001,\"Unlikely\")",
+                "=COUNTIF('Call Tracker - OOS'!U2:U10001,\"Unlikely\")")
+
+    row += 2
 
     # === JR PORTFOLIO ===
     row = build_portfolio_section(
