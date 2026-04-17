@@ -6,10 +6,12 @@ Target Score (0-100) composite signals:
   + Microlyte Eligibility: Yes=15, No=5 (both get ProPacks)
   + Volume percentile within portfolio: top 10%=20, top 25%=15, top 50%=8
   + Incision Likelihood: High=15, Medium-High=10, Medium=5, Low=2, Unlikely=0
-  + Existing collagen user: +10 (pre-qualified wound care buyer)
+  + Greenfield (high vol + NO collagen vendor): +15 (no competitor to displace)
+  + No collagen vendor (any vol): +5
+  + Heavy collagen buyer (100+): -5 (competitor risk — already has a vendor)
   + Verified contact info: +5 (can actually reach them)
 
-Total possible: 115 → cap at 100.
+Total possible: ~115 → cap at 100.
 
 Target Tier Flag:
   A+ (90+): Apex targets — Private Practice + Tier 1-2 + High incision + volume + collagen user
@@ -139,17 +141,25 @@ def compute_score(row, vol_col, vol_p75, vol_p90, vol_p50):
     elif inc == "Low":
         score += 2
 
-    # Existing collagen user — pre-qualified wound-care buyer
+    # Collagen usage — GREENFIELD vs COMPETITOR
+    # High volume + NO collagen = best target (no competitor to displace)
+    # High volume + heavy collagen = they already have a vendor (harder sell)
     lg = safe_float(row.get("Lg Collagen Vol"))
     smmd = safe_float(row.get("Sm/Md Collagen Vol"))
     pwd = safe_float(row.get("Collagen Powder Vol"))
-    if lg > 0 or smmd > 0 or pwd > 0:
-        score += 10
-        total_collagen = lg + smmd + pwd
-        if total_collagen >= 100:
-            reasons.append(f"Heavy collagen user ({int(total_collagen)})")
-        else:
-            reasons.append(f"Collagen user ({int(total_collagen)})")
+    total_collagen = lg + smmd + pwd
+
+    if total_collagen == 0 and vol >= vol_p50:
+        score += 15
+        reasons.append("Greenfield — high volume, no wound care vendor")
+    elif total_collagen == 0:
+        score += 5
+        reasons.append("No current wound care vendor")
+    elif total_collagen >= 100:
+        score -= 5
+        reasons.append(f"⚠ Competitor risk — heavy collagen buyer ({int(total_collagen)})")
+    elif total_collagen > 0:
+        reasons.append(f"Light collagen user ({int(total_collagen)}) — switchable")
 
     # Verified contact info
     phone_status = str(row.get("Phone Status", "") or "")
