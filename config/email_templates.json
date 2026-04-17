@@ -1,0 +1,30 @@
+{
+  "sender_name": "Gabe Albacete",
+  "sender_title": "Owner, Albacete MedDev",
+  "sender_email": "gabe@albacetemeddev.com",
+  "track_a_propacks_only": {
+    "track": "A",
+    "label": "ProPacks Only (LCD state)",
+    "subject": "Post-op incision care for {practice_name}",
+    "body": "Dr. {last_name},\n\n{volume_hook}, I wanted to reach out about a post-op incision care kit that has been getting strong traction with orthopedic practices across the Northeast.\n\nProPacks are standardized post-operative incision kits built specifically for {procedure_focus} patients. Four things practices tell us consistently:\n\n1. Better, more predictable outcomes - fewer calls, fewer wound checks, fewer readmissions.\n2. Meaningfully less physician time on post-op wound management.\n3. Full compliance and audit protection - one documented, reproducible standard across every case.\n4. Increased per-case profitability vs. the piecemeal approach most practices use today.\n\nWould you be open to a 15-minute intro call, or better, a lunch & learn at your {city} office in the next few weeks? I can bring samples and a one-pager on outcomes.\n\nBest,\n{sender_name}\n{sender_title}\n{sender_email}"
+  },
+  "track_b_propacks_plus_microlyte": {
+    "track": "B",
+    "label": "ProPacks + Microlyte SAM (non-LCD state)",
+    "subject": "Post-op incision innovation for {practice_name}",
+    "body": "Dr. {last_name},\n\n{volume_hook}, I wanted to put two products in front of you that have been gaining traction with ortho practices in your MAC jurisdiction.\n\n1. ProPacks - standardized post-op incision care kits built for {procedure_focus} cases. Better outcomes, less physician time on wound management, cleaner audit trail, and stronger per-case economics than the typical piecemeal approach.\n\n2. Microlyte SAM - an advanced antimicrobial wound matrix (HCPCS A2005). Fully synthetic and bioresorbable, ionic/metallic silver that delivers 99.99% microbial reduction for 72+ hours, and a 'peel and place' application with no painful removal. Because your practice falls in a non-LCD MAC jurisdiction, Day 1 post-op use is supported without a 30-day conservative care failure requirement.\n\nWorth a 15-minute intro call, or a lunch & learn at your {city} office? Happy to bring samples of both and the HCPCS / coverage paperwork.\n\nBest,\n{sender_name}\n{sender_title}\n{sender_email}"
+  },
+  "procedure_focus_rules": {
+    "knee_dominant_ratio": 1.5,
+    "hip_dominant_ratio": 1.5,
+    "shoulder_threshold": 200,
+    "default": "joint replacement"
+  },
+  "volume_hook_rules": {
+    "high_volume_threshold": 500,
+    "mid_volume_threshold": 200,
+    "high": "With the volume of {procedure_focus} cases you're managing",
+    "mid": "Given your {procedure_focus} practice",
+    "low": "As an orthopedic surgeon performing {procedure_focus} procedures"
+  }
+}
