@@ -94,6 +94,7 @@ def write_workbook(
     from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
     from openpyxl.utils import get_column_letter
 
+    summary_rows = _summary_rows(df)
     df = _ensure_columns(df)
     tiers = list(tiers) if tiers else TIER_ORDER
 
@@ -126,7 +127,7 @@ def write_workbook(
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = header_align
-    for i, (label, value) in enumerate(_summary_rows(df), start=4):
+    for i, (label, value) in enumerate(summary_rows, start=4):
         summary.cell(row=i, column=1, value=label).font = data_font
         summary.cell(row=i, column=2, value=value).font = data_font
     summary.column_dimensions["A"].width = 40
