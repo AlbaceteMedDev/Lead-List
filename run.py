@@ -74,6 +74,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--origin-lon", type=float, default=tier.NYC_MIDTOWN[1])
     p.add_argument("--force-nppes", action="store_true")
     p.add_argument("--skip-nppes", action="store_true")
+    p.add_argument("--nppes-cache-only", action="store_true", help="Use existing NPPES cache but skip new network lookups")
     p.add_argument("--skip-emails", action="store_true")
     p.add_argument("--skip-trackers", action="store_true", help="Ignore any Master_Lead_List_Tracker*.xlsx in input dir")
     p.add_argument("--output", default="lead_list_enriched")
@@ -123,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
         df["Verified Phone"] = df.get("Phone Number", pd.Series([""] * len(df))).fillna("")
         df["Phone Status"] = df["Verified Phone"].map(lambda v: "Verified" if v else "Missing")
     else:
-        df = nppes.enrich_frame(df, cache_path=args.nppes_cache, force=args.force_nppes)
+        df = nppes.enrich_frame(df, cache_path=args.nppes_cache, force=args.force_nppes, cache_only=args.nppes_cache_only)
 
     if args.skip_emails:
         log.info("Skipping email enrichment (--skip-emails)")

@@ -155,9 +155,12 @@ def _dataset(df: pd.DataFrame) -> list[dict]:
         "Product Line", "Lead Priority", "Lead Status", "Target Tier", "Target Score",
         "Lg Incision Likelihood", "Next Action", "Next Action Date",
         "Last Touch Date", "Touch Count",
-        "Joint Repl Vol", "Open Spine Vol", "Open Ortho Vol", "Procedure Vol",
+        "Joint Repl Vol", "Knee Vol", "Hip Vol", "Shoulder Vol",
+        "Open Spine Vol", "Open Ortho Vol", "Procedure Vol",
         "Lg Collagen Vol", "Sm/Md Collagen Vol", "Collagen Powder Vol",
+        "Total Collagen Vol", "Wound Care DME Vol", "All DME Vol",
         "Why Target?", "Best Approach",
+        "Subject Line", "Draft Email", "Email Track",
     ]
     for i in range(1, 6):
         cols += [f"Call {i} Date", f"Call {i} Outcome", f"Call {i} Notes"]
@@ -253,6 +256,27 @@ _HTML_TEMPLATE = r"""<!doctype html>
   .drawer-footer button.secondary { background: #fff; color: var(--navy); }
   .drawer-footer .spacer { flex: 1; }
   .drawer-footer .quick { font-size: 11px; color: var(--muted); }
+
+  .btn-draft { font-size: 10px; padding: 3px 8px; background: #fff; border: 1px solid var(--navy); color: var(--navy); border-radius: 3px; cursor: pointer; font-weight: 600; }
+  .btn-draft:hover { background: var(--navy); color: #fff; }
+
+  .draft-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 20; }
+  .draft-bg.show { display: block; }
+  .draft-modal { position: fixed; top: 8vh; left: 50%; transform: translateX(-50%); width: min(720px, 92%); max-height: 84vh; background: #fff; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); z-index: 21; display: none; flex-direction: column; }
+  .draft-modal.show { display: flex; }
+  .draft-modal header { background: var(--navy); color: #fff; padding: 12px 18px; border-radius: 8px 8px 0 0; position: relative; }
+  .draft-modal header .close { position: absolute; right: 12px; top: 8px; background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; }
+  .draft-modal h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .draft-modal .subhead { margin-top: 2px; font-size: 12px; color: #d5dbe1; }
+  .draft-body { padding: 14px 18px; overflow-y: auto; }
+  .draft-body .field-row { display: grid; grid-template-columns: 80px 1fr; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .draft-body .field-row label { font-size: 12px; color: var(--muted); }
+  .draft-body input, .draft-body textarea { font: inherit; font-size: 12px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; width: 100%; }
+  .draft-body textarea { min-height: 320px; font-family: ui-monospace, Menlo, Consolas, monospace; resize: vertical; white-space: pre-wrap; }
+  .draft-footer { border-top: 1px solid var(--line); padding: 10px 18px; display: flex; align-items: center; gap: 8px; }
+  .draft-footer button { font: inherit; font-size: 12px; padding: 7px 14px; border-radius: 4px; border: 1px solid var(--navy); background: var(--navy); color: #fff; cursor: pointer; }
+  .draft-footer button:nth-of-type(1) { background: #fff; color: var(--navy); }
+  .draft-footer .spacer { flex: 1; }
 </style>
 </head>
 <body>
@@ -310,11 +334,11 @@ _HTML_TEMPLATE = r"""<!doctype html>
       <table id="leads-table">
         <thead>
           <tr>
-            <th>NPI</th><th>Name</th><th>Practice</th><th>City,ST</th>
+            <th>NPI</th><th>Name</th><th>Specialty</th><th>Practice</th><th>Type</th><th>City,ST</th>
             <th>Line</th><th>Tier</th><th>Target</th><th>Status</th>
             <th>Phone</th><th>Email</th>
             <th>Proc Vol</th><th>Collagen Vol</th>
-            <th>Last Touch</th><th>Touches</th><th>Next Action</th>
+            <th>Last Touch</th><th>Touches</th><th>Next Action</th><th>Draft</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -323,6 +347,26 @@ _HTML_TEMPLATE = r"""<!doctype html>
     <p class="muted" style="margin-top:8px;">Click any row to log a call or email. Edits are saved in your browser. When you are done, click "Download Updates" and commit the file to <code>data/cache/activity.json</code> or hand it off to Gabe.</p>
   </section>
 </main>
+
+<div class="draft-bg" id="draft-bg"></div>
+<div class="draft-modal" id="draft-modal">
+  <header>
+    <button class="close" id="draft-close">&times;</button>
+    <h2 id="draft-title">Draft Email</h2>
+    <div class="subhead" id="draft-subhead"></div>
+  </header>
+  <div class="draft-body">
+    <div class="field-row"><label>To</label><input id="draft-to" readonly /></div>
+    <div class="field-row"><label>Subject</label><input id="draft-subject" readonly /></div>
+    <textarea id="draft-body-text" readonly></textarea>
+  </div>
+  <div class="draft-footer">
+    <span class="muted" id="draft-track"></span>
+    <div class="spacer"></div>
+    <button id="draft-copy">Copy to Clipboard</button>
+    <button id="draft-mailto">Open in Mail</button>
+  </div>
+</div>
 
 <div class="drawer-bg" id="drawer-bg"></div>
 <aside class="drawer" id="drawer">
@@ -511,10 +555,15 @@ function render() {
     tr.className = 'clickable' + (edits[raw['HCP NPI']] ? ' edited' : '');
     tr.dataset.npi = raw['HCP NPI'];
     const t = latestTouch(eff);
+    const practiceTypeBadge = eff['Practice Type'] === 'Hospital-Based'
+      ? '<span class="pill amber">Hospital</span>'
+      : (eff['Practice Type'] === 'Private Practice' ? '<span class="pill green">Private</span>' : escapeHtml(eff['Practice Type'] || ''));
     const cells = [
       escapeHtml(eff['HCP NPI'] || ''),
       escapeHtml(((eff['First Name'] || '') + ' ' + (eff['Last Name'] || '')).trim()),
+      escapeHtml(eff['Specialty'] || ''),
       escapeHtml(eff['Primary Site of Care'] || ''),
+      practiceTypeBadge,
       escapeHtml((eff['City'] || '') + (eff['State'] ? ', ' + eff['State'] : '')),
       escapeHtml(eff['Product Line'] || ''),
       escapeHtml((eff['Tier'] || '').replace(' (', '\n(')),
@@ -527,14 +576,22 @@ function render() {
       escapeHtml(t.last),
       t.count,
       escapeHtml(eff['Next Action'] || ''),
+      eff['Draft Email'] ? '<button class="btn-draft" data-npi="' + escapeHtml(raw['HCP NPI']) + '">Draft Email</button>' : '',
     ];
-    for (const c of cells) { const td = document.createElement('td'); td.innerHTML = c; tr.appendChild(td); }
-    tr.addEventListener('click', () => openDrawer(raw['HCP NPI']));
+    for (let k = 0; k < cells.length; k++) {
+      const td = document.createElement('td');
+      td.innerHTML = cells[k];
+      tr.appendChild(td);
+    }
+    tr.addEventListener('click', (ev) => {
+      if (ev.target.classList && ev.target.classList.contains('btn-draft')) return;
+      openDrawer(raw['HCP NPI']);
+    });
     tbody.appendChild(tr);
   }
   if (filtered.length > limit) {
     const tr = document.createElement('tr');
-    const td = document.createElement('td'); td.colSpan = 15; td.className = 'muted'; td.style.textAlign = 'center';
+    const td = document.createElement('td'); td.colSpan = 18; td.className = 'muted'; td.style.textAlign = 'center';
     td.textContent = 'Showing first ' + limit + ' rows; refine filters to see more.';
     tr.appendChild(td); tbody.appendChild(tr);
   }
@@ -543,6 +600,43 @@ function render() {
 for (const id of ['filter-line','filter-tier','filter-status','filter-target','filter-microlyte','filter-search']) {
   document.getElementById(id).addEventListener('input', render);
 }
+
+document.querySelector('#leads-table tbody').addEventListener('click', (ev) => {
+  const btn = ev.target.closest('.btn-draft');
+  if (!btn) return;
+  ev.stopPropagation();
+  openDraft(btn.dataset.npi);
+});
+
+function openDraft(npi) {
+  const row = ROW_BY_NPI[npi];
+  if (!row) return;
+  document.getElementById('draft-title').textContent = 'Draft for ' + (row['First Name'] || '') + ' ' + (row['Last Name'] || '');
+  document.getElementById('draft-subhead').innerHTML = escapeHtml(row['Primary Site of Care'] || '') + ' | ' + escapeHtml(row['City'] || '') + ', ' + escapeHtml(row['State'] || '') + ' | ' + escapeHtml(row['Product Line'] || '');
+  document.getElementById('draft-to').value = row['Email'] || '';
+  document.getElementById('draft-subject').value = row['Subject Line'] || '';
+  document.getElementById('draft-body-text').value = row['Draft Email'] || '';
+  document.getElementById('draft-track').textContent = row['Email Track'] || '';
+  document.getElementById('draft-bg').classList.add('show');
+  document.getElementById('draft-modal').classList.add('show');
+}
+function closeDraft() {
+  document.getElementById('draft-bg').classList.remove('show');
+  document.getElementById('draft-modal').classList.remove('show');
+}
+document.getElementById('draft-bg').addEventListener('click', closeDraft);
+document.getElementById('draft-close').addEventListener('click', closeDraft);
+document.getElementById('draft-copy').addEventListener('click', async () => {
+  const text = 'Subject: ' + document.getElementById('draft-subject').value + '\n\n' + document.getElementById('draft-body-text').value;
+  try { await navigator.clipboard.writeText(text); document.getElementById('draft-copy').textContent = 'Copied!'; setTimeout(() => document.getElementById('draft-copy').textContent = 'Copy to Clipboard', 1400); }
+  catch (e) { alert('Could not copy: ' + e.message); }
+});
+document.getElementById('draft-mailto').addEventListener('click', () => {
+  const to = encodeURIComponent(document.getElementById('draft-to').value);
+  const subj = encodeURIComponent(document.getElementById('draft-subject').value);
+  const body = encodeURIComponent(document.getElementById('draft-body-text').value);
+  window.location.href = 'mailto:' + to + '?subject=' + subj + '&body=' + body;
+});
 
 const ROW_BY_NPI = {};
 for (const r of rows) ROW_BY_NPI[r['HCP NPI']] = r;

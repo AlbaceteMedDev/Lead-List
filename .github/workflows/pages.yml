@@ -38,7 +38,7 @@ jobs:
           restore-keys: nppes-cache-
 
       - name: Run pipeline
-        run: python run.py --skip-nppes --output lead_list_enriched --dashboard dashboard
+        run: python run.py --nppes-cache-only --output lead_list_enriched --dashboard dashboard
 
       - name: Assemble site
         run: |

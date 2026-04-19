@@ -111,16 +111,24 @@ def _fetch_one(npi: str, session) -> dict:
         return parse_response({})
 
 
-def fetch_many(npis: list[str], cache_path: Path, force: bool = False) -> dict[str, dict]:
-    """Fetch NPPES records for a list of NPIs, using the cache where possible."""
-    cache = _load_cache(cache_path)
-    try:
-        import requests  # type: ignore
-    except ImportError:
-        log.error("requests not installed; skipping NPPES verification")
-        return {n: parse_response({}) for n in npis}
+def fetch_many(npis: list[str], cache_path: Path, force: bool = False, cache_only: bool = False) -> dict[str, dict]:
+    """Fetch NPPES records for a list of NPIs, using the cache where possible.
 
-    session = requests.Session()
+    With ``cache_only=True``, don't hit the network at all — uncached NPIs get
+    an empty placeholder. Used in CI to keep the deploy fast while the cache
+    is grown offline.
+    """
+    cache = _load_cache(cache_path)
+
+    session = None
+    if not cache_only:
+        try:
+            import requests  # type: ignore
+        except ImportError:
+            log.error("requests not installed; skipping NPPES verification")
+            return {n: parse_response({}) for n in npis}
+        session = requests.Session()
+
     out: dict[str, dict] = {}
     new_lookups = 0
     for idx, npi in enumerate(npis, 1):
@@ -129,6 +137,9 @@ def fetch_many(npis: list[str], cache_path: Path, force: bool = False) -> dict[s
         cached = cache.get(npi)
         if cached and not force and _cache_entry_fresh(cached):
             out[npi] = cached["data"]
+            continue
+        if cache_only:
+            out[npi] = parse_response({})
             continue
         data = _fetch_one(npi, session)
         cache[npi] = {"fetched_at": datetime.now(timezone.utc).isoformat(), "data": data}
@@ -161,14 +172,14 @@ def reconcile_phone(original: Optional[str], nppes_phone: str, nppes_found: bool
     return nppes_phone, STATUS_UPDATED
 
 
-def enrich_frame(df: pd.DataFrame, cache_path: Path, force: bool = False) -> pd.DataFrame:
+def enrich_frame(df: pd.DataFrame, cache_path: Path, force: bool = False, cache_only: bool = False) -> pd.DataFrame:
     df = df.copy()
     if "HCP NPI" not in df.columns:
         log.warning("No HCP NPI column; skipping NPPES enrichment")
         return df
 
     npis = [str(n) for n in df["HCP NPI"].tolist()]
-    results = fetch_many(npis, cache_path=cache_path, force=force)
+    results = fetch_many(npis, cache_path=cache_path, force=force, cache_only=cache_only)
 
     def _row(npi: str) -> dict:
         return results.get(str(npi), parse_response({}))
