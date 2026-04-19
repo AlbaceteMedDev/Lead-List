@@ -44,7 +44,7 @@ CALL_TRACKER_COLS = [
     "Call 4 Date", "Call 4 Outcome", "Call 4 Notes",
     "Call 5 Date", "Call 5 Outcome", "Call 5 Notes",
     "Next Action", "Next Action Date", "Decision Maker?",
-    "Target Score", "Target Tier", "Why Target?", "Best Approach",
+    "Target Score", "Target Tier", "Target Tier Reason", "Why Target?", "Best Approach",
 ]
 
 EMAIL_TRACKER_COLS = [
@@ -78,7 +78,7 @@ COLUMN_WIDTHS = {
     "Total Collagen Vol": 13, "Wound Care DME Vol": 13, "All DME Vol": 10,
     "Lg Incision Likelihood": 13,
     "Next Action": 24, "Next Action Date": 13, "Decision Maker?": 10,
-    "Target Score": 10, "Target Tier": 9, "Why Target?": 40, "Best Approach": 22,
+    "Target Score": 10, "Target Tier": 9, "Target Tier Reason": 60, "Why Target?": 40, "Best Approach": 22,
     "Subject Line": 36, "Draft Email": 60,
 }
 for i in range(1, 6):
@@ -242,7 +242,8 @@ def _write_sheet(
             cell.border = border
             if r_idx % 2 == 0:
                 cell.fill = alt_fill
-            if name in ("Why Target?", "Draft Email", "Call 1 Notes", "Call 2 Notes", "Call 3 Notes",
+            if name in ("Why Target?", "Target Tier Reason", "Draft Email",
+                        "Call 1 Notes", "Call 2 Notes", "Call 3 Notes",
                         "Call 4 Notes", "Call 5 Notes", "Email 1 Notes", "Email 2 Notes", "Email 3 Notes",
                         "Next Action"):
                 cell.alignment = styles["wrap_top"]

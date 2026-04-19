@@ -94,7 +94,16 @@ def _volume_label(volume: float, top10: float, top25: float) -> str:
     return ""
 
 
-def target_tier_label(score: int) -> str:
+def target_tier_label(score: int, practice_type: str = "") -> str:
+    """A+/A requires Private Practice - hospital systems are harder to sell into."""
+    if practice_type == "Hospital-Based":
+        if score >= 55:
+            return "B"
+        if score >= 40:
+            return "C"
+        if score >= 25:
+            return "D"
+        return "F"
     if score >= 85:
         return "A+"
     if score >= 70:
@@ -103,11 +112,13 @@ def target_tier_label(score: int) -> str:
         return "B"
     if score >= 40:
         return "C"
-    return "D"
+    if score >= 25:
+        return "D"
+    return "F"
 
 
 def lead_priority(target_tier: str) -> str:
-    return {"A+": "A", "A": "A", "B": "B", "C": "C"}.get(target_tier, "D")
+    return {"A+": "A", "A": "A", "B": "B", "C": "C", "D": "D"}.get(target_tier, "F")
 
 
 def best_approach(score: int, tier: str, microlyte: str) -> str:
@@ -155,6 +166,87 @@ def _detect_volume_columns(columns) -> dict:
     }
 
 
+def _tier_rationale(t_tier: str, practice_type: str) -> str:
+    """One-line summary of what this grade means."""
+    if practice_type == "Hospital-Based":
+        capped = " (capped - hospital-based, hard to sell into)"
+        return {
+            "B": "Solid hospital-based prospect" + capped,
+            "C": "Average hospital-based prospect" + capped,
+            "D": "Low-priority hospital-based prospect" + capped,
+            "F": "Skip - hospital-based and low score",
+        }.get(t_tier, "")
+    return {
+        "A+": "Top priority - call this week",
+        "A": "High priority - call within 2 weeks",
+        "B": "Solid prospect - work into rotation",
+        "C": "Average - email nurture first",
+        "D": "Low priority - email only",
+        "F": "Skip - weak fit",
+    }.get(t_tier, "")
+
+
+def _tier_reason_breakdown(
+    t_tier: str,
+    score: int,
+    practice_type: str,
+    tier: str,
+    microlyte: str,
+    incision: str,
+    vol_label: str,
+    vol_pts: int,
+) -> str:
+    """Per-lead explanation of exactly how the Target Tier was reached."""
+    parts: list[str] = []
+    parts.append(_tier_rationale(t_tier, practice_type))
+
+    pos: list[str] = []
+    neg: list[str] = []
+
+    if practice_type == "Private Practice":
+        pos.append("+25 Private Practice")
+    elif practice_type == "Hospital-Based":
+        neg.append("+10 Hospital-Based (tier capped at B)")
+    else:
+        neg.append(f"+10 {practice_type or 'unknown practice type'}")
+
+    tier_pts = _TIER_POINTS.get(tier, 5)
+    tier_short = tier.split(" (")[0] if tier and "(" in tier else (tier or "Unknown tier")
+    if tier_pts >= 15:
+        pos.append(f"+{tier_pts} {tier_short}")
+    elif tier_pts >= 8:
+        neg.append(f"+{tier_pts} {tier_short}")
+    else:
+        neg.append(f"+{tier_pts} {tier_short}")
+
+    if microlyte == "Yes":
+        pos.append("+15 Microlyte eligible (non-LCD MAC)")
+    else:
+        neg.append("+0 LCD state - Microlyte not eligible")
+
+    if vol_pts >= 20:
+        pos.append(f"+{vol_pts} {vol_label or 'top 10% volume'}")
+    elif vol_pts >= 10:
+        pos.append(f"+{vol_pts} {vol_label or 'top 25% volume'}")
+    elif vol_pts > 0:
+        neg.append(f"+{vol_pts} {vol_label or 'some volume'}")
+    else:
+        neg.append("+0 no procedure volume data")
+
+    inc_pts = _INCISION_POINTS.get(incision, 0)
+    if incision in (INCISION_HIGH, INCISION_MED_HIGH):
+        pos.append(f"+{inc_pts} {incision} incision likelihood")
+    else:
+        neg.append(f"+{inc_pts} {incision} incision likelihood")
+
+    parts.append(f"Score {score}/100")
+    if pos:
+        parts.append("Strengths: " + "; ".join(pos))
+    if neg:
+        parts.append("Weaknesses: " + "; ".join(neg))
+    return " | ".join(p for p in parts if p)
+
+
 def enrich_frame(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     volume_cols = _detect_volume_columns(df.columns)
@@ -171,6 +263,7 @@ def enrich_frame(df: pd.DataFrame) -> pd.DataFrame:
     priorities: list[str] = []
     approaches: list[str] = []
     reasons: list[str] = []
+    tier_reasons: list[str] = []
 
     for idx, row in df.iterrows():
         vol = primary.iloc[df.index.get_loc(idx)] if primary_vol_col else 0.0
@@ -178,19 +271,24 @@ def enrich_frame(df: pd.DataFrame) -> pd.DataFrame:
         vol_pts = _volume_percentile_points(vol, top10, top25)
         vol_label = _volume_label(vol, top10, top25)
 
-        practice_pts = 25 if row.get("Practice Type") == "Private Practice" else 10
-        tier_pts = _TIER_POINTS.get(row.get("Tier", ""), 5)
-        microlyte_pts = 15 if row.get("Microlyte Eligible") == "Yes" else 0
+        practice_type = row.get("Practice Type", "")
+        tier = row.get("Tier", "")
+        microlyte = row.get("Microlyte Eligible", "")
+
+        practice_pts = 25 if practice_type == "Private Practice" else 10
+        tier_pts = _TIER_POINTS.get(tier, 5)
+        microlyte_pts = 15 if microlyte == "Yes" else 0
         score = practice_pts + tier_pts + microlyte_pts + vol_pts + _INCISION_POINTS[incision]
         score = int(min(100, score))
 
-        t_tier = target_tier_label(score)
+        t_tier = target_tier_label(score, practice_type)
         incisions.append(incision)
         scores.append(score)
         target_tiers.append(t_tier)
         priorities.append(lead_priority(t_tier))
-        approaches.append(best_approach(score, row.get("Tier", ""), row.get("Microlyte Eligible", "")))
+        approaches.append(best_approach(score, tier, microlyte))
         reasons.append(why_target(row, vol_label, incision))
+        tier_reasons.append(_tier_reason_breakdown(t_tier, score, practice_type, tier, microlyte, incision, vol_label, vol_pts))
 
     df["Lg Incision Likelihood"] = incisions
     df["Target Score"] = scores
@@ -198,4 +296,5 @@ def enrich_frame(df: pd.DataFrame) -> pd.DataFrame:
     df["Lead Priority"] = priorities
     df["Best Approach"] = approaches
     df["Why Target?"] = reasons
+    df["Target Tier Reason"] = tier_reasons
     return df

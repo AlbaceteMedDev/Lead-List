@@ -15,7 +15,17 @@ def test_target_tier_buckets():
     assert scoring.target_tier_label(75) == "A"
     assert scoring.target_tier_label(60) == "B"
     assert scoring.target_tier_label(45) == "C"
-    assert scoring.target_tier_label(20) == "D"
+    assert scoring.target_tier_label(30) == "D"
+    assert scoring.target_tier_label(15) == "F"
+
+
+def test_hospital_based_caps_at_b():
+    assert scoring.target_tier_label(95, "Hospital-Based") == "B"
+    assert scoring.target_tier_label(75, "Hospital-Based") == "B"
+    assert scoring.target_tier_label(60, "Hospital-Based") == "B"
+    assert scoring.target_tier_label(45, "Hospital-Based") == "C"
+    assert scoring.target_tier_label(30, "Hospital-Based") == "D"
+    assert scoring.target_tier_label(15, "Hospital-Based") == "F"
 
 
 def test_lead_priority_mapping():

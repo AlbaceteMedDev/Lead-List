@@ -159,7 +159,7 @@ def _dataset(df: pd.DataFrame) -> list[dict]:
         "Open Spine Vol", "Open Ortho Vol", "Procedure Vol",
         "Lg Collagen Vol", "Sm/Md Collagen Vol", "Collagen Powder Vol",
         "Total Collagen Vol", "Wound Care DME Vol", "All DME Vol",
-        "Why Target?", "Best Approach",
+        "Why Target?", "Target Tier Reason", "Best Approach",
         "Subject Line", "Draft Email", "Email Track",
     ]
     for i in range(1, 6):
@@ -684,6 +684,12 @@ function buildDrawerBody(row) {
     + '<div class="field"><label>MAC / Microlyte</label><span>' + escapeHtml(eff['MAC Jurisdiction'] || '') + ' / ' + escapeHtml(eff['Microlyte Eligible'] || '') + '</span></div>'
     + '<div class="field"><label>Incision Likelihood</label><span>' + escapeHtml(eff['Lg Incision Likelihood'] || '') + '</span></div>'
     + '</section>');
+  if (eff['Target Tier Reason']) {
+    sections.push('<section><h3>Why this grade (' + escapeHtml(eff['Target Tier'] || '') + ')</h3>'
+      + '<div style="font-size:12px;color:var(--ink);background:#f7f9fa;padding:10px;border-radius:4px;white-space:pre-wrap;">'
+      + escapeHtml(eff['Target Tier Reason']).replace(/\|/g, '<br>')
+      + '</div></section>');
+  }
   sections.push('<section><h3>Lead</h3>'
     + '<div class="field"><label>Lead Status</label>' + selectField('Lead Status', eff['Lead Status'], LEAD_STATUSES) + '</div>'
     + '<div class="field"><label>Lead Priority</label><span>' + escapeHtml(eff['Lead Priority'] || '') + ' (' + escapeHtml(eff['Target Tier'] || '') + ')</span></div>'
