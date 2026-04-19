@@ -313,6 +313,7 @@ _HTML_TEMPLATE = r"""<!doctype html>
             <th>NPI</th><th>Name</th><th>Practice</th><th>City,ST</th>
             <th>Line</th><th>Tier</th><th>Target</th><th>Status</th>
             <th>Phone</th><th>Email</th>
+            <th>Proc Vol</th><th>Collagen Vol</th>
             <th>Last Touch</th><th>Touches</th><th>Next Action</th>
           </tr>
         </thead>
@@ -464,6 +465,21 @@ function latestTouch(row) {
   return { last: dates[dates.length - 1] || '', count: dates.length };
 }
 
+function num(v) { const n = parseFloat(String(v || '0').replace(/,/g, '')); return isFinite(n) ? n : 0; }
+
+function procedureVolume(row) {
+  const line = row['Product Line'];
+  if (line === 'JR') return num(row['Joint Repl Vol']);
+  if (line === 'S&N') return num(row['Open Spine Vol']) || num(row['Joint Repl Vol']);
+  if (line === 'OOS') return num(row['Procedure Vol']) || num(row['Open Ortho Vol']);
+  return num(row['Joint Repl Vol']) || num(row['Open Spine Vol']) || num(row['Procedure Vol']);
+}
+
+function collagenVolume(row) {
+  if (row['Total Collagen Vol']) return num(row['Total Collagen Vol']);
+  return num(row['Lg Collagen Vol']) + num(row['Sm/Md Collagen Vol']) + num(row['Collagen Powder Vol']);
+}
+
 function render() {
   const line = document.getElementById('filter-line').value;
   const tier = document.getElementById('filter-tier').value;
@@ -506,6 +522,8 @@ function render() {
       statusPill(eff['Lead Status']),
       escapeHtml(eff['Verified Phone'] || ''),
       escapeHtml(eff['Email'] || ''),
+      procedureVolume(eff).toLocaleString(),
+      collagenVolume(eff).toLocaleString(),
       escapeHtml(t.last),
       t.count,
       escapeHtml(eff['Next Action'] || ''),
@@ -516,7 +534,7 @@ function render() {
   }
   if (filtered.length > limit) {
     const tr = document.createElement('tr');
-    const td = document.createElement('td'); td.colSpan = 13; td.className = 'muted'; td.style.textAlign = 'center';
+    const td = document.createElement('td'); td.colSpan = 15; td.className = 'muted'; td.style.textAlign = 'center';
     td.textContent = 'Showing first ' + limit + ' rows; refine filters to see more.';
     tr.appendChild(td); tbody.appendChild(tr);
   }
@@ -544,6 +562,34 @@ function textareaField(name, value) {
 function buildDrawerBody(row) {
   const eff = effective(row);
   const sections = [];
+  const volRows = [
+    ['Joint Replacement', eff['Joint Repl Vol']],
+    ['Knee', eff['Knee Vol']],
+    ['Hip', eff['Hip Vol']],
+    ['Shoulder', eff['Shoulder Vol']],
+    ['Open Ortho', eff['Open Ortho Vol']],
+    ['Open Spine', eff['Open Spine Vol']],
+    ['Other Procedure', eff['Procedure Vol']],
+    ['Lg Collagen Sheet', eff['Lg Collagen Vol']],
+    ['Sm/Md Collagen Sheet', eff['Sm/Md Collagen Vol']],
+    ['Collagen Powder', eff['Collagen Powder Vol']],
+    ['Total Collagen', eff['Total Collagen Vol']],
+    ['Wound Care DME', eff['Wound Care DME Vol']],
+    ['All DME', eff['All DME Vol']],
+  ].filter(([, v]) => v && num(v) > 0);
+  if (volRows.length) {
+    sections.push('<section><h3>Volumes</h3>' + volRows.map(([k, v]) =>
+      '<div class="field"><label>' + k + '</label><span>' + num(v).toLocaleString() + '</span></div>'
+    ).join('') + '</section>');
+  }
+  sections.push('<section><h3>Verification</h3>'
+    + '<div class="field"><label>Practice Type</label><span>' + escapeHtml(eff['Practice Type'] || '') + '</span></div>'
+    + '<div class="field"><label>Drive Tier (NYC)</label><span>' + escapeHtml(eff['Tier'] || '') + '</span></div>'
+    + '<div class="field"><label>Phone</label><span>' + escapeHtml(eff['Verified Phone'] || '(none)') + ' - ' + escapeHtml(eff['Phone Status'] || '') + '</span></div>'
+    + '<div class="field"><label>Email</label><span>' + escapeHtml(eff['Email'] || '(none)') + ' - ' + escapeHtml(eff['Email Status'] || '') + '</span></div>'
+    + '<div class="field"><label>MAC / Microlyte</label><span>' + escapeHtml(eff['MAC Jurisdiction'] || '') + ' / ' + escapeHtml(eff['Microlyte Eligible'] || '') + '</span></div>'
+    + '<div class="field"><label>Incision Likelihood</label><span>' + escapeHtml(eff['Lg Incision Likelihood'] || '') + '</span></div>'
+    + '</section>');
   sections.push('<section><h3>Lead</h3>'
     + '<div class="field"><label>Lead Status</label>' + selectField('Lead Status', eff['Lead Status'], LEAD_STATUSES) + '</div>'
     + '<div class="field"><label>Lead Priority</label><span>' + escapeHtml(eff['Lead Priority'] || '') + ' (' + escapeHtml(eff['Target Tier'] || '') + ')</span></div>'
