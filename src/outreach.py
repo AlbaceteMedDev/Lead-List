@@ -114,22 +114,46 @@ def generate_for_row(row: pd.Series, templates: dict, volume_cols: dict) -> dict
 
 def detect_volume_columns(columns) -> dict:
     """Locate AcuityMD procedure-volume columns regardless of exact phrasing."""
-    def find(needle: str) -> Optional[str]:
+    def find(needle: str, exclude: list[str] = ()) -> Optional[str]:
         for c in columns:
             low = c.lower()
-            if needle in low and "procedure volume" in low:
-                return c
+            if "procedure volume" not in low:
+                continue
+            if needle not in low:
+                continue
+            if any(x in low for x in exclude):
+                continue
+            return c
         return None
 
     joint_repl = (
-        find("joint replacement") or find("total joint") or find("arthroplasty")
+        find("joint replacement", exclude=["knee", "hip", "shoulder"])
+        or find("total joint")
+        or find("arthroplasty")
     )
+    lg_collagen = find("lg collagen sheet", exclude=["sm/md", "powder"])
+    sm_md_collagen = find("sm/md collagen sheet", exclude=["powder", "lg collagen"])
+    collagen_powder = find("collagen powder", exclude=["sheet"])
+    total_collagen = find("sm/md collagen sheet,collagen powder,lg collagen sheet")
+    open_spine = find("open spine")
+    wound_dme = find("wound care dme")
+    all_dme = find("all of dme")
+    generic = find("outisde of ortho + spine") or find("outside of ortho + spine")
+
     return {
         "joint_repl": joint_repl,
         "knee": find("knee"),
         "hip": find("hip"),
         "shoulder": find("shoulder"),
-        "open_ortho": find("open ortho") or find("orthopedic"),
+        "open_ortho": find("open orthopedic") or find("open ortho"),
+        "open_spine": open_spine,
+        "lg_collagen": lg_collagen,
+        "sm_md_collagen": sm_md_collagen,
+        "collagen_powder": collagen_powder,
+        "total_collagen": total_collagen,
+        "wound_dme": wound_dme,
+        "all_dme": all_dme,
+        "generic_procedure": generic,
     }
 
 
@@ -146,17 +170,26 @@ def enrich_frame(df: pd.DataFrame, templates: dict) -> pd.DataFrame:
     df["Draft Email"] = bodies
     df["Email Track"] = tracks
 
-    rename_map = {}
-    if volume_cols["joint_repl"]:
-        rename_map[volume_cols["joint_repl"]] = "Joint Repl Vol"
-    if volume_cols["knee"]:
-        rename_map[volume_cols["knee"]] = "Knee Vol"
-    if volume_cols["hip"]:
-        rename_map[volume_cols["hip"]] = "Hip Vol"
-    if volume_cols["shoulder"]:
-        rename_map[volume_cols["shoulder"]] = "Shoulder Vol"
-    if volume_cols["open_ortho"]:
-        rename_map[volume_cols["open_ortho"]] = "Open Ortho Vol"
+    rename_map: dict[str, str] = {}
+    rename_targets = {
+        "joint_repl": "Joint Repl Vol",
+        "knee": "Knee Vol",
+        "hip": "Hip Vol",
+        "shoulder": "Shoulder Vol",
+        "open_ortho": "Open Ortho Vol",
+        "open_spine": "Open Spine Vol",
+        "lg_collagen": "Lg Collagen Vol",
+        "sm_md_collagen": "Sm/Md Collagen Vol",
+        "collagen_powder": "Collagen Powder Vol",
+        "total_collagen": "Total Collagen Vol",
+        "wound_dme": "Wound Care DME Vol",
+        "all_dme": "All DME Vol",
+        "generic_procedure": "Procedure Vol",
+    }
+    for key, target in rename_targets.items():
+        src_col = volume_cols.get(key)
+        if src_col and src_col in df.columns and target not in df.columns:
+            rename_map[src_col] = target
     if rename_map:
         df = df.rename(columns=rename_map)
     return df
