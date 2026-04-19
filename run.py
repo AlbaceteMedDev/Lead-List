@@ -137,6 +137,10 @@ def main(argv: list[str] | None = None) -> int:
     df = scoring.enrich_frame(df)
 
     activity = tracking.ingest_trackers(tracker_files, args.activity_cache)
+    edit_files = tracking.find_edit_files(args.activity_cache.parent)
+    if edit_files:
+        activity = tracking.apply_edit_files(edit_files, activity)
+        tracking.save_cache(args.activity_cache, activity)
     df = tracking.apply_activity(df, activity)
     df = tracking.summarize_last_touch(df)
 

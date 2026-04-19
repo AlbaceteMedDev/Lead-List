@@ -33,8 +33,10 @@ CALL_TRACKER_COLS = [
     "Verified Phone", "Phone Status",
     "Primary Site of Care", "City", "State", "Practice Type", "Tier",
     "Lead Priority", "Lead Status", "MAC Jurisdiction", "Microlyte Eligible",
-    "Joint Repl Vol", "Open Spine Vol", "Open Ortho Vol",
+    "Joint Repl Vol", "Knee Vol", "Hip Vol", "Shoulder Vol",
+    "Open Ortho Vol", "Open Spine Vol", "Procedure Vol",
     "Lg Collagen Vol", "Sm/Md Collagen Vol", "Collagen Powder Vol",
+    "Total Collagen Vol", "Wound Care DME Vol", "All DME Vol",
     "Lg Incision Likelihood",
     "Call 1 Date", "Call 1 Outcome", "Call 1 Notes",
     "Call 2 Date", "Call 2 Outcome", "Call 2 Notes",
@@ -50,7 +52,9 @@ EMAIL_TRACKER_COLS = [
     "Email", "Email Status",
     "Primary Site of Care", "City", "State", "Practice Type", "Tier",
     "Lead Priority", "Lead Status", "MAC Jurisdiction", "Microlyte Eligible",
-    "Joint Repl Vol", "Open Spine Vol", "Open Ortho Vol",
+    "Joint Repl Vol", "Open Spine Vol", "Open Ortho Vol", "Procedure Vol",
+    "Lg Collagen Vol", "Sm/Md Collagen Vol", "Collagen Powder Vol",
+    "Wound Care DME Vol", "All DME Vol",
     "Email 1 Date", "Email 1 Subject", "Email 1 Outcome", "Email 1 Notes",
     "Email 2 Date", "Email 2 Subject", "Email 2 Outcome", "Email 2 Notes",
     "Email 3 Date", "Email 3 Subject", "Email 3 Outcome", "Email 3 Notes",
@@ -68,8 +72,10 @@ COLUMN_WIDTHS = {
     "Primary Site of Care": 28, "City": 14, "State": 6,
     "Practice Type": 16, "Tier": 22, "Lead Priority": 10, "Lead Status": 18,
     "MAC Jurisdiction": 12, "Microlyte Eligible": 10,
-    "Joint Repl Vol": 11, "Open Spine Vol": 11, "Open Ortho Vol": 11,
+    "Joint Repl Vol": 11, "Knee Vol": 9, "Hip Vol": 9, "Shoulder Vol": 11,
+    "Open Ortho Vol": 11, "Open Spine Vol": 11, "Procedure Vol": 11,
     "Lg Collagen Vol": 11, "Sm/Md Collagen Vol": 13, "Collagen Powder Vol": 13,
+    "Total Collagen Vol": 13, "Wound Care DME Vol": 13, "All DME Vol": 10,
     "Lg Incision Likelihood": 13,
     "Next Action": 24, "Next Action Date": 13, "Decision Maker?": 10,
     "Target Score": 10, "Target Tier": 9, "Why Target?": 40, "Best Approach": 22,
@@ -143,6 +149,16 @@ def _dashboard_metrics(df: pd.DataFrame, by_line: dict[str, pd.DataFrame]) -> li
                 n += int((subset[col].astype(str).str.strip() != "").sum())
         return n
 
+    def vol_sum(subset: pd.DataFrame, col: str) -> int:
+        if col not in subset.columns:
+            return 0
+        return int(pd.to_numeric(subset[col], errors="coerce").fillna(0).sum())
+
+    def vol_users(subset: pd.DataFrame, col: str) -> int:
+        if col not in subset.columns:
+            return 0
+        return int((pd.to_numeric(subset[col], errors="coerce").fillna(0) > 0).sum())
+
     lines = [code for code in routing.PRODUCT_LINES if code in by_line]
     rows: list[list] = [
         ["ALBACETE MEDDEV — OUTREACH DASHBOARD"],
@@ -172,6 +188,21 @@ def _dashboard_metrics(df: pd.DataFrame, by_line: dict[str, pd.DataFrame]) -> li
         ["Meetings Booked"] + [by_status(by_line[c], "Meeting Booked") for c in lines],
         ["Target Tier A+"] + [count(by_line[c], by_line[c].get("Target Tier", pd.Series()) == "A+") for c in lines],
         ["Target Tier A"] + [count(by_line[c], by_line[c].get("Target Tier", pd.Series()) == "A") for c in lines],
+        [],
+        ["COLLAGEN USAGE"],
+        ["Metric"] + [f"{code}" for code in lines],
+        ["Leads Using Any Collagen"] + [vol_users(by_line[c], "Total Collagen Vol") or (vol_users(by_line[c], "Lg Collagen Vol") + vol_users(by_line[c], "Sm/Md Collagen Vol") + vol_users(by_line[c], "Collagen Powder Vol")) for c in lines],
+        ["Total Lg Sheet Volume"] + [vol_sum(by_line[c], "Lg Collagen Vol") for c in lines],
+        ["Total Sm/Md Sheet Volume"] + [vol_sum(by_line[c], "Sm/Md Collagen Vol") for c in lines],
+        ["Total Powder Volume"] + [vol_sum(by_line[c], "Collagen Powder Vol") for c in lines],
+        [],
+        ["PROCEDURE VOLUME (sum across leads)"],
+        ["Metric"] + [f"{code}" for code in lines],
+        ["Joint Replacement"] + [vol_sum(by_line[c], "Joint Repl Vol") for c in lines],
+        ["Open Spine"] + [vol_sum(by_line[c], "Open Spine Vol") for c in lines],
+        ["Open Ortho"] + [vol_sum(by_line[c], "Open Ortho Vol") for c in lines],
+        ["Other Procedure Vol"] + [vol_sum(by_line[c], "Procedure Vol") for c in lines],
+        ["Wound Care DME"] + [vol_sum(by_line[c], "Wound Care DME Vol") for c in lines],
         [],
         ["INCISION LIKELIHOOD"],
         ["Metric"] + [f"{code}" for code in lines],

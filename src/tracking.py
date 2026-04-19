@@ -178,6 +178,38 @@ def find_tracker_files(input_dir: Path) -> list[Path]:
     return sorted(input_dir.glob("Master_Lead_List_Tracker*.xlsx"))
 
 
+def find_edit_files(cache_dir: Path) -> list[Path]:
+    """Return every ``activity_edits*.json`` the dashboard has downloaded."""
+    cache_dir = Path(cache_dir)
+    if not cache_dir.exists():
+        return []
+    return sorted(cache_dir.glob("activity_edits*.json"))
+
+
+def apply_edit_files(edit_files: Iterable[Path], cache: dict[str, dict]) -> dict[str, dict]:
+    """Merge each dashboard-exported JSON edit file into the cache.
+
+    Files are renamed with ``.applied`` suffix so they don't get re-merged.
+    """
+    merged = dict(cache)
+    for path in edit_files:
+        try:
+            incoming = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            log.warning("Could not parse edit file %s: %s", path, exc)
+            continue
+        if not isinstance(incoming, dict):
+            log.warning("Edit file %s is not a JSON object; skipping", path)
+            continue
+        log.info("Applying %d edits from %s", len(incoming), path.name)
+        merged = merge_activity(merged, incoming)
+        try:
+            path.rename(path.with_suffix(path.suffix + ".applied"))
+        except OSError as exc:
+            log.warning("Could not mark %s applied: %s", path, exc)
+    return merged
+
+
 def apply_activity(df: pd.DataFrame, activity: dict[str, dict]) -> pd.DataFrame:
     """Left-join activity onto the enriched frame by NPI."""
     df = df.copy()
