@@ -260,6 +260,21 @@ _HTML_TEMPLATE = r"""<!doctype html>
   .btn-draft { font-size: 10px; padding: 3px 8px; background: #fff; border: 1px solid var(--navy); color: var(--navy); border-radius: 3px; cursor: pointer; font-weight: 600; }
   .btn-draft:hover { background: var(--navy); color: #fff; }
 
+  .quick-log { display: flex; gap: 8px; margin-bottom: 10px; }
+  .quick-btn { font: inherit; font-size: 13px; font-weight: 600; padding: 10px 14px; border-radius: 5px; border: 1px solid var(--navy); background: #fff; color: var(--navy); cursor: pointer; flex: 1; }
+  .quick-btn:hover { background: #e8f3fb; }
+  .quick-btn.primary { background: var(--navy); color: #fff; }
+  .quick-btn.primary:hover { background: #143b57; }
+  .quick-log-form { background: #f7fafc; border: 1px solid var(--line); border-radius: 5px; padding: 10px; margin-top: 6px; }
+  .quick-log-form .field { grid-template-columns: 80px 1fr; }
+  .date-quick { display: flex; gap: 4px; align-items: center; }
+  .date-quick input[type="date"] { flex: 1; }
+  .date-btn { font: inherit; font-size: 11px; padding: 4px 8px; border: 1px solid var(--line); background: #fff; border-radius: 3px; cursor: pointer; }
+  .date-btn:hover { background: #e8f3fb; border-color: var(--navy); }
+  .quick-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 6px; }
+  .quick-actions button { font: inherit; font-size: 12px; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--navy); background: #fff; color: var(--navy); cursor: pointer; }
+  .quick-actions button.primary { background: var(--navy); color: #fff; }
+
   .draft-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 20; }
   .draft-bg.show { display: block; }
   .draft-modal { position: fixed; top: 8vh; left: 50%; transform: translateX(-50%); width: min(720px, 92%); max-height: 84vh; background: #fff; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); z-index: 21; display: none; flex-direction: column; }
@@ -647,6 +662,12 @@ function selectField(name, value, options) {
   return '<select data-field="' + name + '">' + opts + '</select>';
 }
 function inputField(name, value, type) {
+  if (type === 'date') {
+    return '<div class="date-quick">'
+      + '<input type="date" data-field="' + name + '" value="' + escapeHtml(value || '') + '" />'
+      + '<button type="button" class="date-btn quick-set" data-for="' + escapeHtml(name) + '" data-offset="0">Today</button>'
+      + '</div>';
+  }
   return '<input type="' + (type || 'text') + '" data-field="' + name + '" value="' + escapeHtml(value || '') + '" />';
 }
 function textareaField(name, value) {
@@ -690,6 +711,29 @@ function buildDrawerBody(row) {
       + escapeHtml(eff['Target Tier Reason']).replace(/\|/g, '<br>')
       + '</div></section>');
   }
+  sections.push('<section><h3>Quick Log</h3>'
+    + '<div class="quick-log">'
+    + '<button type="button" class="quick-btn primary" id="qlog-call" data-npi="' + escapeHtml(row['HCP NPI']) + '">📞 Log Call Now</button>'
+    + '<button type="button" class="quick-btn" id="qlog-email" data-npi="' + escapeHtml(row['HCP NPI']) + '">✉️ Log Email Now</button>'
+    + '</div>'
+    + '<div class="quick-log-form" id="quick-log-form" style="display:none;">'
+    + '<div class="field"><label>Date</label>'
+    + '<div class="date-quick">'
+    + '<input type="date" id="quick-date" />'
+    + '<button type="button" class="date-btn" data-offset="0">Today</button>'
+    + '<button type="button" class="date-btn" data-offset="-1">Yesterday</button>'
+    + '</div></div>'
+    + '<div class="field"><label>Outcome</label><select id="quick-outcome"></select></div>'
+    + '<div class="field"><label id="quick-subject-lbl" style="display:none;">Subject</label><input id="quick-subject" style="display:none;" /></div>'
+    + '<div class="field"><label>Notes</label><textarea id="quick-notes" placeholder="What happened?"></textarea></div>'
+    + '<div class="field"><label>Update Status?</label>'
+    + '<select id="quick-status">'
+    + LEAD_STATUSES.map(s => '<option value="' + escapeHtml(s) + '">' + (s ? escapeHtml(s) : '(leave unchanged)') + '</option>').join('')
+    + '</select></div>'
+    + '<div class="quick-actions"><button type="button" class="primary" id="quick-save">Save to Browser</button> <button type="button" id="quick-cancel">Cancel</button></div>'
+    + '</div>'
+    + '</section>');
+
   sections.push('<section><h3>Lead</h3>'
     + '<div class="field"><label>Lead Status</label>' + selectField('Lead Status', eff['Lead Status'], LEAD_STATUSES) + '</div>'
     + '<div class="field"><label>Lead Priority</label><span>' + escapeHtml(eff['Lead Priority'] || '') + ' (' + escapeHtml(eff['Target Tier'] || '') + ')</span></div>'
@@ -744,6 +788,89 @@ function closeDrawer() {
 document.getElementById('drawer-bg').addEventListener('click', closeDrawer);
 document.getElementById('drawer-close').addEventListener('click', closeDrawer);
 document.getElementById('drawer-cancel').addEventListener('click', closeDrawer);
+
+let quickMode = null;
+function todayIso() { const d = new Date(); d.setHours(12); return d.toISOString().slice(0,10); }
+function dateWithOffset(days) { const d = new Date(); d.setDate(d.getDate() + days); d.setHours(12); return d.toISOString().slice(0,10); }
+
+document.getElementById('drawer-body').addEventListener('click', (ev) => {
+  const quickSet = ev.target.closest('.date-btn.quick-set');
+  if (quickSet) {
+    const target = document.querySelector('#drawer-body [data-field="' + quickSet.dataset.for + '"]');
+    if (target) target.value = dateWithOffset(parseInt(quickSet.dataset.offset, 10) || 0);
+    return;
+  }
+  const call = ev.target.closest('#qlog-call');
+  const email = ev.target.closest('#qlog-email');
+  if (!call && !email) {
+    const db = ev.target.closest('.date-btn');
+    if (db) { document.getElementById('quick-date').value = dateWithOffset(parseInt(db.dataset.offset, 10) || 0); }
+    return;
+  }
+  quickMode = call ? 'call' : 'email';
+  const form = document.getElementById('quick-log-form');
+  form.style.display = 'block';
+  document.getElementById('quick-date').value = todayIso();
+  document.getElementById('quick-notes').value = '';
+  const subjLbl = document.getElementById('quick-subject-lbl');
+  const subjIn = document.getElementById('quick-subject');
+  const outcomeSel = document.getElementById('quick-outcome');
+  outcomeSel.innerHTML = '';
+  const opts = quickMode === 'call' ? CALL_OUTCOMES : EMAIL_OUTCOMES;
+  for (const o of opts) { const op = document.createElement('option'); op.value = o; op.textContent = o || '(pick outcome)'; outcomeSel.appendChild(op); }
+  outcomeSel.value = '';
+  if (quickMode === 'email') { subjLbl.style.display = ''; subjIn.style.display = ''; subjIn.value = ''; }
+  else { subjLbl.style.display = 'none'; subjIn.style.display = 'none'; }
+  document.getElementById('quick-status').value = '';
+  outcomeSel.focus();
+});
+
+document.getElementById('drawer-body').addEventListener('click', (ev) => {
+  if (!ev.target.matches('#quick-cancel')) return;
+  document.getElementById('quick-log-form').style.display = 'none';
+  quickMode = null;
+});
+
+document.getElementById('drawer-body').addEventListener('click', (ev) => {
+  if (!ev.target.matches('#quick-save')) return;
+  if (!drawerNpi || !quickMode) return;
+  const outcome = document.getElementById('quick-outcome').value;
+  if (!outcome) { alert('Pick an outcome before saving.'); return; }
+  const date = document.getElementById('quick-date').value || todayIso();
+  const notes = document.getElementById('quick-notes').value.trim();
+  const subject = document.getElementById('quick-subject').value.trim();
+  const newStatus = document.getElementById('quick-status').value;
+  const row = ROW_BY_NPI[drawerNpi] || {};
+  const patch = edits[drawerNpi] ? Object.assign({}, edits[drawerNpi]) : {};
+
+  const rounds = quickMode === 'call' ? 5 : 3;
+  const label = quickMode === 'call' ? 'Call' : 'Email';
+  let slot = 0;
+  for (let i = 1; i <= rounds; i++) {
+    const existing = (patch[label + ' ' + i + ' Date'] !== undefined ? patch[label + ' ' + i + ' Date'] : row[label + ' ' + i + ' Date']) || '';
+    if (!existing.trim()) { slot = i; break; }
+  }
+  if (!slot) { slot = rounds; }
+
+  patch[label + ' ' + slot + ' Date'] = date;
+  patch[label + ' ' + slot + ' Outcome'] = outcome;
+  if (notes) patch[label + ' ' + slot + ' Notes'] = notes;
+  if (quickMode === 'email' && subject) patch[label + ' ' + slot + ' Subject'] = subject;
+  if (newStatus) patch['Lead Status'] = newStatus;
+
+  edits[drawerNpi] = patch;
+  localStorage.setItem(LS_KEY, JSON.stringify(edits));
+  const savedNpi = drawerNpi;
+  closeDrawer();
+  render();
+  const m = quickMode === 'call' ? 'Call' : 'Email';
+  const badge = document.createElement('div');
+  badge.textContent = m + ' #' + slot + ' logged for ' + (row['First Name'] || '') + ' ' + (row['Last Name'] || '') + '. Remember to Download Updates.';
+  badge.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27ae60;color:#fff;padding:10px 18px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.2);z-index:50;font-size:13px;';
+  document.body.appendChild(badge);
+  setTimeout(() => badge.remove(), 3500);
+  quickMode = null;
+});
 
 document.getElementById('drawer-save').addEventListener('click', () => {
   if (!drawerNpi) return;
