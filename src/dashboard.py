@@ -197,8 +197,10 @@ _HTML_TEMPLATE = r"""<!doctype html>
   header { background: var(--navy); color: #fff; padding: 12px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   header h1 { margin: 0; font-size: 17px; font-weight: 600; }
   header .meta { color: #d5dbe1; font-size: 12px; flex: 1; }
-  header button { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
-  header button:hover { background: rgba(255,255,255,0.25); }
+  header button, header .hdr-btn { background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 6px 12px; font-size: 12px; cursor: pointer; text-decoration: none; display: inline-block; }
+  header button:hover, header .hdr-btn:hover { background: rgba(255,255,255,0.25); }
+  header .hdr-btn { background: #27ae60; border-color: #27ae60; font-weight: 600; }
+  header .hdr-btn:hover { background: #229954; }
   header .pending { background: var(--warn); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; display: none; }
   header .pending.show { display: inline-block; }
   main { max-width: 1600px; margin: 0 auto; padding: 16px; }
@@ -299,6 +301,7 @@ _HTML_TEMPLATE = r"""<!doctype html>
   <h1>Albacete MedDev - Outreach Tracker</h1>
   <span class="meta" id="gen-meta"></span>
   <span class="pending" id="pending-count">0 unsaved edits</span>
+  <a href="lead_list.xlsx" download class="hdr-btn">Download Excel Lead List</a>
   <button id="btn-download">Download Updates</button>
   <button id="btn-import">Import Updates</button>
   <button id="btn-discard">Discard</button>
