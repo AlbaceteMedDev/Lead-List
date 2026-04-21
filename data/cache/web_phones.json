@@ -474,5 +474,145 @@
     "practice": "Michigan Orthopaedic Surgeons",
     "address": "29110 Inkster Road Suite 100, Southfield, MI 48034",
     "fetched_at": "2026-04-21"
+  },
+  "1992734586": {
+    "phone": "8109530500",
+    "source": "Greater Michigan Orthopedics",
+    "practice": "Greater Michigan Orthopedics (Ascension-affiliated)",
+    "address": "861 Health Park Blvd, Grand Blanc, MI 48439",
+    "fetched_at": "2026-04-21"
+  },
+  "1164422218": {
+    "phone": "6163965855",
+    "source": "Shoreline Orthopaedics",
+    "practice": "Shoreline Orthopaedics (Corewell-affiliated)",
+    "address": "370 North 120th Avenue Suite 20, Holland, MI 49424",
+    "fetched_at": "2026-04-21"
+  },
+  "1104021427": {
+    "phone": "9083576110",
+    "source": "Summit Health",
+    "practice": "Summit Health Orthopedics (formerly Summit Medical Group, now Optum)",
+    "address": "1 Diamond Hill Rd, Berkeley Heights, NJ 07922",
+    "fetched_at": "2026-04-21"
+  },
+  "1417960063": {
+    "phone": "6099271991",
+    "source": "Shore Orthopaedic University",
+    "practice": "Shore Orthopaedic University Associates",
+    "address": "24 MacArthur Blvd, Somers Point, NJ 08244",
+    "fetched_at": "2026-04-21"
+  },
+  "1487861373": {
+    "phone": "7327412313",
+    "source": "Hackensack Meridian",
+    "practice": "Hackensack Meridian Health (hospital-affiliated)",
+    "address": "80 Oak Hill Rd, Red Bank, NJ",
+    "fetched_at": "2026-04-21"
+  },
+  "1861426835": {
+    "phone": "6099246301",
+    "source": "Princeton Orthopaedic Associates",
+    "practice": "Princeton Orthopaedic Associates",
+    "address": "325 Princeton Ave, Princeton, NJ 08540",
+    "fetched_at": "2026-04-21"
+  },
+  "1871804211": {
+    "phone": "7329386090",
+    "source": "University Orthopaedic Associates / RWJBH",
+    "practice": "University Orthopaedic Associates (UOA)",
+    "address": "4810 Belmar Blvd, Neptune, NJ 07753",
+    "fetched_at": "2026-04-21"
+  },
+  "1821417585": {
+    "phone": "8605254469",
+    "source": "Orthopedic Surgical Partners",
+    "practice": "Orthopedic Surgical Partners (Trinity Health affiliated)",
+    "address": "1111 Cromwell Ave Bldg 4 Ste 404, Rocky Hill, CT 06067",
+    "fetched_at": "2026-04-21"
+  },
+  "1346274750": {
+    "phone": "5184982663",
+    "source": "OrthoNY",
+    "practice": "OrthoNY",
+    "address": "Albany/Clifton Park/Saratoga/Schenectady, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1780831404": {
+    "phone": "2123082540",
+    "source": "Pearl Orthopedics",
+    "practice": "Pearl Orthopedics / HMP Orthopedics",
+    "address": "50 East 77th St 1C, New York, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1215097779": {
+    "phone": "8608324666",
+    "source": "Starling Physicians / Orthopedic Surgical Partners",
+    "practice": "Starling Physicians Orthopaedic Surgery & Sports Medicine",
+    "address": "2110 Silas Deane Hwy, Rocky Hill, CT 06067",
+    "fetched_at": "2026-04-21"
+  },
+  "1154680478": {
+    "phone": "9149044036",
+    "source": "Mehta Orthopedics / St John's Riverside",
+    "practice": "Mehta Orthopedics",
+    "address": "1022 North Broadway, Yonkers, NY 10701",
+    "fetched_at": "2026-04-21"
+  },
+  "1760408199": {
+    "phone": "5165362800",
+    "source": "Orlin & Cohen / Northwell",
+    "practice": "Orlin & Cohen (Rockville Centre)",
+    "address": "36 Lincoln Avenue Floor 2, Rockville Centre, NY 11570",
+    "fetched_at": "2026-04-21"
+  },
+  "1922307214": {
+    "phone": "7162043200",
+    "source": "UBMD Orthopaedics",
+    "practice": "UBMD Orthopaedics (hospital-affiliated)",
+    "address": "111 N Maplemere Rd Ste 100, Williamsville, NY 14221",
+    "fetched_at": "2026-04-21"
+  },
+  "1467485292": {
+    "phone": "2033372600",
+    "source": "Orthopaedic Specialty Group",
+    "practice": "Orthopaedic Specialty Group (OSGPC)",
+    "address": "305 Black Rock Tpke, Fairfield, CT 06825",
+    "fetched_at": "2026-04-21"
+  },
+  "1477532489": {
+    "phone": "2034832518",
+    "source": "Connecticut Orthopaedics",
+    "practice": "Connecticut Orthopaedics (Branford)",
+    "address": "84 N Main St, Branford, CT 06405",
+    "fetched_at": "2026-04-21"
+  },
+  "1063438224": {
+    "phone": "2037971500",
+    "source": "OrthoConnecticut / Nuvance",
+    "practice": "OrthoConnecticut (Danbury Hospital-affiliated)",
+    "address": "2 Riverview Drive, Danbury, CT 06810",
+    "fetched_at": "2026-04-21"
+  },
+  "1053630723": {
+    "phone": "6316894162",
+    "source": "OALI / Catholic Health LI",
+    "practice": "Orthopedic Associates of Long Island (OALI)",
+    "address": "6 Technology Drive Suite 100, East Setauket, NY 11733",
+    "fetched_at": "2026-04-21"
+  },
+  "1457396145": {
+    "phone": "2033372600",
+    "source": "Dr. Backe private / OSGPC",
+    "practice": "Dr. Henry Backe MD private practice",
+    "address": "305 Black Rock Turnpike, Fairfield, CT 06825",
+    "fetched_at": "2026-04-21"
+  },
+  "1922049956": {
+    "phone": "6462937505",
+    "source": "NYU Langone / Summit Health",
+    "practice": "NYU Langone Orthopedics (hospital-affiliated)",
+    "address": "260 E 66th St, New York, NY 10065",
+    "fetched_at": "2026-04-21"
   }
 }
