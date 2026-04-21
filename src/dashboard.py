@@ -151,6 +151,7 @@ def _dataset(df: pd.DataFrame) -> list[dict]:
         "HCP NPI", "First Name", "Last Name", "Credential", "Specialty",
         "Email", "Email Status", "Verified Phone", "Phone Status",
         "NPPES Phone", "Phone Number",
+        "Web Phone", "Web Phone Source", "Web Practice", "Web Address",
         "Primary Site of Care", "Practice Type", "City", "State",
         "Tier", "MAC Jurisdiction", "Microlyte Eligible",
         "Address 1", "Postal Code",
@@ -543,14 +544,31 @@ function procedureVolume(row) {
 }
 
 function phonePillCell(row) {
+  const isPrivate = row['Practice Type'] === 'Private Practice';
+  const web = (row['Web Phone'] || '').replace(/\D/g, '');
   const nppes = (row['NPPES Phone'] || '').replace(/\D/g, '');
   const acuity = (row['Phone Number'] || '').replace(/\D/g, '');
+
   const pieces = [];
-  if (nppes) {
-    pieces.push('<div><span class="pill green">NPPES</span> ' + escapeHtml(nppes) + '</div>');
+  const seen = new Set();
+
+  // For Private Practice leads, prefer the web-sourced phone because NPPES
+  // self-reports can be years stale. Fall back to NPPES then Acuity.
+  if (isPrivate && web) {
+    pieces.push('<div><span class="pill green">Web</span> ' + escapeHtml(web) + '</div>');
+    seen.add(web);
   }
-  if (acuity && acuity !== nppes) {
+  if (nppes && !seen.has(nppes)) {
+    pieces.push('<div><span class="pill ' + (isPrivate && web ? 'navy' : 'green') + '">NPPES</span> ' + escapeHtml(nppes) + '</div>');
+    seen.add(nppes);
+  }
+  if (acuity && !seen.has(acuity)) {
     pieces.push('<div><span class="pill navy">Acuity</span> ' + escapeHtml(acuity) + '</div>');
+    seen.add(acuity);
+  }
+  if (!isPrivate && web && !seen.has(web)) {
+    pieces.push('<div><span class="pill navy">Web</span> ' + escapeHtml(web) + '</div>');
+    seen.add(web);
   }
   if (!pieces.length) return '<span class="pill red">No phone</span>';
   return pieces.join('');
@@ -755,6 +773,8 @@ function buildDrawerBody(row) {
     + '<div class="field"><label>Address</label><span>' + escapeHtml([eff['Address 1'] || '', eff['City'] || '', eff['State'] || '', eff['Postal Code'] || ''].filter(x => x).join(', ')) + '</span></div>'
     + googleLinks
     + '<div class="field"><label>Drive Tier (NYC)</label><span>' + escapeHtml(eff['Tier'] || '') + '</span></div>'
+    + (eff['Web Phone'] ? '<div class="field"><label>Web Phone</label><span>' + escapeHtml(eff['Web Phone']) + (eff['Web Phone Source'] ? ' <span class="muted">(' + escapeHtml(eff['Web Phone Source']) + ')</span>' : '') + '</span></div>' : '')
+    + (eff['Web Practice'] ? '<div class="field"><label>Web Practice</label><span>' + escapeHtml(eff['Web Practice']) + '</span></div>' : '')
     + (eff['NPPES Phone'] ? '<div class="field"><label>NPPES Phone</label><span>' + escapeHtml(eff['NPPES Phone']) + '</span></div>' : '')
     + (eff['Phone Number'] && eff['Phone Number'].replace(/\D/g, '') !== (eff['NPPES Phone'] || '').replace(/\D/g, '') ? '<div class="field"><label>Acuity Phone</label><span>' + escapeHtml(eff['Phone Number']) + '</span></div>' : '')
     + (eff['Alternate Phones'] ? '<div class="field"><label>Alt. Phones</label><span>' + escapeHtml(eff['Alternate Phones']) + '</span></div>' : '')

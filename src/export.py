@@ -30,8 +30,8 @@ log = logging.getLogger(__name__)
 
 CALL_TRACKER_COLS = [
     "HCP NPI", "First Name", "Last Name", "Credential", "Specialty",
-    "NPPES Phone", "Phone Number", "Phone Status", "Alternate Phones",
-    "Practice Match", "NPPES Practice Address",
+    "Web Phone", "NPPES Phone", "Phone Number", "Phone Status", "Alternate Phones",
+    "Web Practice", "Practice Match", "NPPES Practice Address",
     "Primary Site of Care", "City", "State", "Practice Type", "Tier",
     "Lead Priority", "Lead Status", "MAC Jurisdiction", "Microlyte Eligible",
     "Joint Repl Vol", "Knee Vol", "Hip Vol", "Shoulder Vol",
@@ -71,6 +71,7 @@ COLUMN_WIDTHS = {
     "Specialty": 28, "Email": 32, "Email Status": 24,
     "Verified Phone": 13, "Phone Status": 20,
     "NPPES Phone": 13, "Phone Number": 13,
+    "Web Phone": 13, "Web Practice": 30,
     "Alternate Phones": 28, "Practice Match": 28, "NPPES Practice Address": 30,
     "Primary Site of Care": 28, "City": 14, "State": 6,
     "Practice Type": 16, "Tier": 22, "Lead Priority": 10, "Lead Status": 18,

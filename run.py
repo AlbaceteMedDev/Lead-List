@@ -31,7 +31,7 @@ import pandas as pd
 
 from src import (
     classify, dashboard, email_enrich, export, ingest, mac_mapping, nppes,
-    outreach, routing, scoring, tier, tracking,
+    outreach, routing, scoring, tier, tracking, web_phones,
 )
 
 ROOT = Path(__file__).resolve().parent
@@ -136,6 +136,8 @@ def main(argv: list[str] | None = None) -> int:
     df = mac_mapping.enrich_frame(df, mac_cfg)
     df = outreach.enrich_frame(df, templates)
     df = scoring.enrich_frame(df)
+
+    df = web_phones.apply(df, args.activity_cache.parent / "web_phones.json")
 
     activity = tracking.ingest_trackers(tracker_files, args.activity_cache)
     edit_files = tracking.find_edit_files(args.activity_cache.parent)
