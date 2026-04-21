@@ -103,5 +103,33 @@
     "practice": "OrthoNY",
     "address": "121 Everett Rd, Albany, NY 12205",
     "fetched_at": "2026-04-21"
+  },
+  "1730103862": {
+    "phone": "8606445900",
+    "source": "Tolland County Orthopedic",
+    "practice": "Robotic Hip and Knee / Dr. Dua's office",
+    "address": "2800 Tamarack Ave Ste 106, South Windsor, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1902241151": {
+    "phone": "5166818822",
+    "source": "Central Orthopedic Group",
+    "practice": "Central Orthopedic Group",
+    "address": "651 Old Country Rd, Plainview, NY 11803",
+    "fetched_at": "2026-04-21"
+  },
+  "1871024208": {
+    "phone": "5167953033",
+    "source": "Total Ortho Sports Medicine",
+    "practice": "Total Ortho Sports Medicine",
+    "address": "115 Eileen Way, Syosset, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1336535368": {
+    "phone": "5165362800",
+    "source": "Orlin & Cohen",
+    "practice": "Orlin & Cohen Orthopedic Group",
+    "address": "1728 Sunrise Hwy, Merrick, NY 11566",
+    "fetched_at": "2026-04-21"
   }
 }
