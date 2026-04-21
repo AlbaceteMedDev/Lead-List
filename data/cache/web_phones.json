@@ -754,5 +754,75 @@
     "practice": "OAA Orthopaedic Specialists",
     "address": "250 Cetronia Rd Ste A, Allentown, PA 18104",
     "fetched_at": "2026-04-21"
+  },
+  "1952517963": {
+    "phone": "6092679400",
+    "source": "Reconstructive Orthopedics",
+    "practice": "Reconstructive Orthopedics, PA",
+    "address": "401 Young Ave Ste 245, Moorestown, NJ 08057",
+    "fetched_at": "2026-04-21"
+  },
+  "1104850528": {
+    "phone": "5087551123",
+    "source": "Worcester County Orthopedics",
+    "practice": "Worcester County Orthopedics",
+    "address": "59 Quinsigamond Ave, Worcester, MA 01610",
+    "fetched_at": "2026-04-21"
+  },
+  "1588644405": {
+    "phone": "6092679400",
+    "source": "Reconstructive Orthopedics",
+    "practice": "Reconstructive Orthopedics, PA",
+    "address": "401 Young Ave Ste 245, Moorestown, NJ 08057",
+    "fetched_at": "2026-04-21"
+  },
+  "1740375898": {
+    "phone": "9735424166",
+    "source": "Nutley Orthopaedic Group",
+    "practice": "Nutley Orthopaedic Group",
+    "address": "45 Franklin Avenue, Nutley, NJ 07110",
+    "fetched_at": "2026-04-21"
+  },
+  "1972037729": {
+    "phone": "2019752323",
+    "source": "Optum Medical Care of NJ",
+    "practice": "Rutherford Optum Orthopedics",
+    "address": "201 Route 17 Floor 12, Rutherford, NJ 07070",
+    "fetched_at": "2026-04-21"
+  },
+  "1669433165": {
+    "phone": "2017914434",
+    "source": "Garden State Orthopaedic Associates",
+    "practice": "Garden State Orthopaedic Associates",
+    "address": "28-04 Broadway, Fair Lawn, NJ 07410",
+    "fetched_at": "2026-04-21"
+  },
+  "1275597882": {
+    "phone": "8602423000",
+    "source": "Advanced Orthopedics New England",
+    "practice": "Advanced Orthopedics New England / Connecticut Orthopedic Associates",
+    "address": "35 Jolley Dr Ste 301, Bloomfield, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1396181178": {
+    "phone": "8606528883",
+    "source": "Orthopaedic Sports Specialists",
+    "practice": "Orthopaedic Sports Specialists PC",
+    "address": "84 Glastonbury Blvd Ste 101, Glastonbury, CT 06033",
+    "fetched_at": "2026-04-21"
+  },
+  "1164425070": {
+    "phone": "8608324666",
+    "source": "Starling Physicians / Trinity Health",
+    "practice": "Starling Physicians Orthopaedic Surgery & Sports Medicine",
+    "address": "73 Cedar St, New Britain, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1982602868": {
+    "phone": "8606528883",
+    "source": "Orthopaedic Sports Specialists",
+    "practice": "Orthopaedic Sports Specialists PC",
+    "address": "114 Woodland St, Hartford, CT 06105",
+    "fetched_at": "2026-04-21"
   }
 }

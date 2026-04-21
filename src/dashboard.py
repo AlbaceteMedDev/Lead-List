@@ -764,7 +764,7 @@ function buildDrawerBody(row) {
     + '<a target="_blank" rel="noopener" href="https://www.google.com/search?q=' + googleQ + '">🔍 Google</a> &nbsp; '
     + '<a target="_blank" rel="noopener" href="https://www.healthgrades.com/usearch?what=' + encodeURIComponent(nameForSearch) + '&where=' + encodeURIComponent(locForSearch) + '">Healthgrades</a> &nbsp; '
     + '<a target="_blank" rel="noopener" href="https://doctor.webmd.com/results?q=' + encodeURIComponent(nameForSearch) + '&location=' + encodeURIComponent(locForSearch) + '">WebMD</a> &nbsp; '
-    + '<a target="_blank" rel="noopener" href="https://npiregistry.cms.hhs.gov/provider-view/' + npiQ + '">NPI Registry</a>'
+    + '<a target="_blank" rel="noopener" href="https://opennpi.com/provider/' + npiQ + '">OpenNPI</a>'
     + '</span></div>';
 
   sections.push('<section><h3>Verification</h3>'
