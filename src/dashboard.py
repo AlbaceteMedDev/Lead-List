@@ -736,10 +736,24 @@ function buildDrawerBody(row) {
       '<div class="field"><label>' + k + '</label><span>' + num(v).toLocaleString() + '</span></div>'
     ).join('') + '</section>');
   }
+  const nameForSearch = ((eff['First Name'] || '') + ' ' + (eff['Last Name'] || '')).trim();
+  const locForSearch = ((eff['City'] || '') + ' ' + (eff['State'] || '')).trim();
+  const spec = (eff['Specialty'] || '').split(',')[0].split('>')[0].trim();
+  const googleQ = encodeURIComponent(nameForSearch + ' ' + spec + ' ' + locForSearch);
+  const npiQ = encodeURIComponent(eff['HCP NPI'] || '');
+  const googleLinks =
+    '<div class="field"><label>Web Check</label><span>'
+    + '<a target="_blank" rel="noopener" href="https://www.google.com/search?q=' + googleQ + '">🔍 Google</a> &nbsp; '
+    + '<a target="_blank" rel="noopener" href="https://www.healthgrades.com/usearch?what=' + encodeURIComponent(nameForSearch) + '&where=' + encodeURIComponent(locForSearch) + '">Healthgrades</a> &nbsp; '
+    + '<a target="_blank" rel="noopener" href="https://doctor.webmd.com/results?q=' + encodeURIComponent(nameForSearch) + '&location=' + encodeURIComponent(locForSearch) + '">WebMD</a> &nbsp; '
+    + '<a target="_blank" rel="noopener" href="https://npidb.org/npi-lookup/?number=' + npiQ + '">NPI DB</a>'
+    + '</span></div>';
+
   sections.push('<section><h3>Verification</h3>'
     + '<div class="field"><label>Practice Type</label><span>' + escapeHtml(eff['Practice Type'] || '') + '</span></div>'
     + '<div class="field"><label>Primary Site</label><span>' + escapeHtml(eff['Primary Site of Care'] || '') + '</span></div>'
     + '<div class="field"><label>Address</label><span>' + escapeHtml([eff['Address 1'] || '', eff['City'] || '', eff['State'] || '', eff['Postal Code'] || ''].filter(x => x).join(', ')) + '</span></div>'
+    + googleLinks
     + '<div class="field"><label>Drive Tier (NYC)</label><span>' + escapeHtml(eff['Tier'] || '') + '</span></div>'
     + (eff['NPPES Phone'] ? '<div class="field"><label>NPPES Phone</label><span>' + escapeHtml(eff['NPPES Phone']) + '</span></div>' : '')
     + (eff['Phone Number'] && eff['Phone Number'].replace(/\D/g, '') !== (eff['NPPES Phone'] || '').replace(/\D/g, '') ? '<div class="field"><label>Acuity Phone</label><span>' + escapeHtml(eff['Phone Number']) + '</span></div>' : '')
