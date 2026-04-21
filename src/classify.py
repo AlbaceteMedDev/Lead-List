@@ -51,4 +51,19 @@ def classify_frame(df: pd.DataFrame, keywords: dict, column: str = "Primary Site
     df = df.copy()
     sites = df[column] if column in df.columns else pd.Series([""] * len(df))
     df["Practice Type"] = sites.fillna("").map(lambda s: classify_site(s, keywords))
+
+    # If a web-verified practice name is present, let it override:
+    # - "hospital-owned" / "hospital-affiliated" -> Hospital-Based
+    # - any other verified name -> Private Practice (even if AcuityMD said hospital)
+    # A doctor with BOTH a private office and hospital privileges is Private
+    # for outreach purposes since we can sell into their private office.
+    if "Web Practice" in df.columns:
+        for idx in df.index:
+            web = str(df.at[idx, "Web Practice"] or "").lower()
+            if not web:
+                continue
+            if "hospital-owned" in web or "hospital-affiliated" in web or "(hospital" in web:
+                df.at[idx, "Practice Type"] = HOSPITAL
+            else:
+                df.at[idx, "Practice Type"] = PRIVATE
     return df

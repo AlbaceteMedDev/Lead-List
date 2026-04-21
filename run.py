@@ -138,6 +138,9 @@ def main(argv: list[str] | None = None) -> int:
     df = scoring.enrich_frame(df)
 
     df = web_phones.apply(df, args.activity_cache.parent / "web_phones.json")
+    # Re-run classification now that web-verified practice names are available
+    # so any manual hospital/private overrides from web_phones take effect.
+    df = classify.classify_frame(df, hospital_keywords)
 
     activity = tracking.ingest_trackers(tracker_files, args.activity_cache)
     edit_files = tracking.find_edit_files(args.activity_cache.parent)
