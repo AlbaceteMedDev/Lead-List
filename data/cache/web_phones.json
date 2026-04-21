@@ -334,5 +334,145 @@
     "practice": "OrthoConnecticut",
     "address": "36 Old Kings Highway South, Darien, CT 06820",
     "fetched_at": "2026-04-21"
+  },
+  "1306340229": {
+    "phone": "2038691145",
+    "source": "ONS Greenwich",
+    "practice": "Orthopaedic & Neurosurgery Specialists (ONS)",
+    "address": "6 Greenwich Office Park, Greenwich, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1902148281": {
+    "phone": "8454540120",
+    "source": "OrthoADC / ONS",
+    "practice": "Orthopedic Associates of Dutchess County / ONS Greenwich",
+    "address": "1910 South Rd, Poughkeepsie, NY 12601",
+    "fetched_at": "2026-04-21"
+  },
+  "1427005495": {
+    "phone": "5166278717",
+    "source": "Orthopaedic Associates of Manhasset",
+    "practice": "Orthopaedic Associates of Manhasset",
+    "address": "600 Northern Blvd Ste 300, Great Neck, NY 11021",
+    "fetched_at": "2026-04-21"
+  },
+  "1003084849": {
+    "phone": "5182922660",
+    "source": "Dr. Zanaros private / St. Peter's Health Partners",
+    "practice": "Dr. George Zanaros M.D. (private ortho)",
+    "address": "1367 Washington Ave Ste 200, Albany, NY 12206",
+    "fetched_at": "2026-04-21"
+  },
+  "1508845850": {
+    "phone": "8449820241",
+    "source": "OrthoADC / Montefiore",
+    "practice": "Orthopedic Associates of Dutchess County",
+    "address": "Hopewell Junction / New Windsor / Poughkeepsie NY offices",
+    "fetched_at": "2026-04-21"
+  },
+  "1578643367": {
+    "phone": "8609784900",
+    "source": "Middlesex Orthopedic & Spine / Spire Ortho",
+    "practice": "Middlesex Orthopedic & Spine Associates / Spire Ortho Partners",
+    "address": "Middletown CT (Greenwich, Bristol, Stamford offices)",
+    "fetched_at": "2026-04-21"
+  },
+  "1578668315": {
+    "phone": "5166818822",
+    "source": "Central Orthopedic Group",
+    "practice": "Central Orthopedic Group",
+    "address": "651 Old Country Rd Ste 200, Plainview, NY 11803",
+    "fetched_at": "2026-04-21"
+  },
+  "1285080291": {
+    "phone": "2483352977",
+    "source": "Orthopedic Specialists of Oakland County",
+    "practice": "Orthopedic Specialists of Oakland County",
+    "address": "44038 Woodward Ave Suite 200, Bloomfield Hills, MI 48302",
+    "fetched_at": "2026-04-21"
+  },
+  "1568433191": {
+    "phone": "7347827003",
+    "source": "Precision Orthopedics",
+    "practice": "Precision Orthopedics PC",
+    "address": "25755 Telegraph Rd, Brownstown, MI 48183",
+    "fetched_at": "2026-04-21"
+  },
+  "1316258015": {
+    "phone": "5166818822",
+    "source": "Central Orthopedic Group",
+    "practice": "Central Orthopedic Group",
+    "address": "651 Old Country Road, Plainview, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1316300486": {
+    "phone": "",
+    "source": "GOGLOC / Munson Healthcare (no direct line)",
+    "practice": "GOGLOC (Petoskey) / McLaren Northern Michigan-affiliated",
+    "address": "2325 Summit Park Dr STE A, Petoskey, MI",
+    "fetched_at": "2026-04-21"
+  },
+  "1043535552": {
+    "phone": "2488468060",
+    "source": "Michigan Orthopaedic Surgeons",
+    "practice": "Michigan Orthopaedic Surgeons",
+    "address": "4967 Crooks Road Suite 100, Troy, MI 48098",
+    "fetched_at": "2026-04-21"
+  },
+  "1972505816": {
+    "phone": "8109854900",
+    "source": "Orthopedic Associates of Port Huron",
+    "practice": "Orthopedic Associates of Port Huron",
+    "address": "940 River Centre Dr, Port Huron, MI 48060",
+    "fetched_at": "2026-04-21"
+  },
+  "1477769891": {
+    "phone": "9062251321",
+    "source": "Advanced Center for Orthopedics",
+    "practice": "Advanced Center for Orthopedics and Plastic Surgery",
+    "address": "1414 W Fair Ave Ste 190, Marquette, MI 49855",
+    "fetched_at": "2026-04-21"
+  },
+  "1083053730": {
+    "phone": "9893301064",
+    "source": "Central Michigan Orthopaedics",
+    "practice": "Ryan J Lilly MD PLLC / Central Michigan Orthopaedics",
+    "address": "2890 Health Pkwy, Mount Pleasant, MI",
+    "fetched_at": "2026-04-21"
+  },
+  "1275702102": {
+    "phone": "2317331326",
+    "source": "Orthopaedic Associates of Muskegon",
+    "practice": "Orthopaedic Associates of Muskegon",
+    "address": "1400 Mercy Dr Ste 100, Muskegon, MI 49444",
+    "fetched_at": "2026-04-21"
+  },
+  "1093009979": {
+    "phone": "8109530500",
+    "source": "Greater Michigan Orthopedics",
+    "practice": "Greater Michigan Orthopedics / Dr. Nelson (Henry Ford Genesys-affiliated)",
+    "address": "861 Health Park Blvd, Grand Blanc, MI",
+    "fetched_at": "2026-04-21"
+  },
+  "1790766004": {
+    "phone": "8107331200",
+    "source": "OrthoMichigan / McLaren Flint",
+    "practice": "OrthoMichigan (McLaren-affiliated)",
+    "address": "4466 W Bristol Rd, Flint, MI 48507",
+    "fetched_at": "2026-04-21"
+  },
+  "1811333008": {
+    "phone": "9062251321",
+    "source": "Advanced Center for Orthopedics",
+    "practice": "Advanced Center for Orthopedics and Plastic Surgery",
+    "address": "1414 W Fair Ave Ste 190, Marquette, MI 49855",
+    "fetched_at": "2026-04-21"
+  },
+  "1629286877": {
+    "phone": "2482349300",
+    "source": "Michigan Orthopaedic Surgeons",
+    "practice": "Michigan Orthopaedic Surgeons",
+    "address": "29110 Inkster Road Suite 100, Southfield, MI 48034",
+    "fetched_at": "2026-04-21"
   }
 }
