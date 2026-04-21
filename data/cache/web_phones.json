@@ -824,5 +824,110 @@
     "practice": "Orthopaedic Sports Specialists PC",
     "address": "114 Woodland St, Hartford, CT 06105",
     "fetched_at": "2026-04-21"
+  },
+  "1649430711": {
+    "phone": "7189204378",
+    "source": "Montefiore Einstein",
+    "practice": "Montefiore Medical Center Orthopedics (hospital-owned)",
+    "address": "1250 Waters Pl, Bronx, NY 10461",
+    "fetched_at": "2026-04-21"
+  },
+  "1891141560": {
+    "phone": "2127373301",
+    "source": "NY Orthopedics / Nicholas Institute",
+    "practice": "NY Orthopedics (Nicholas Institute of Sports Medicine)",
+    "address": "159 East 74th Street Mezzanine, New York, NY 10021",
+    "fetched_at": "2026-04-21"
+  },
+  "1457587941": {
+    "phone": "2122890700",
+    "source": "Manhattan Orthopedics",
+    "practice": "Manhattan Orthopedics",
+    "address": "57 W 57th St, New York, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1023379203": {
+    "phone": "7183324747",
+    "source": "Atlantic Orthopedics & Sports Medicine",
+    "practice": "Wert Orthopaedics & Sports Medicine / Atlantic Orthopedics",
+    "address": "3423 Guider Ave, Brooklyn, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1457463507": {
+    "phone": "7182507700",
+    "source": "Brooklyn Hospital Center",
+    "practice": "The Brooklyn Hospital Center Orthopedics (hospital-owned)",
+    "address": "121 DeKalb Ave, Brooklyn, NY 11201",
+    "fetched_at": "2026-04-21"
+  },
+  "1063946499": {
+    "phone": "3478420899",
+    "source": "NYP Medical Group Queens",
+    "practice": "NewYork-Presbyterian Queens Orthopedics (hospital-owned)",
+    "address": "28-25 Jackson Ave, Long Island City, NY 11101",
+    "fetched_at": "2026-04-21"
+  },
+  "1417278060": {
+    "phone": "8607010140",
+    "source": "Orthopedic Partners",
+    "practice": "Orthopedic Partners / Constitution Surgical Center East",
+    "address": "140 Cross Road, Waterford, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1043210156": {
+    "phone": "7184588944",
+    "source": "Kleinman Orthopedics",
+    "practice": "Kleinman Orthopedics",
+    "address": "78-15 Eliot Ave, Middle Village, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1023274990": {
+    "phone": "5162950111",
+    "source": "South Island Orthopedics",
+    "practice": "South Island Orthopedics, PC",
+    "address": "657 Central Avenue, Cedarhurst, NY 11516",
+    "fetched_at": "2026-04-21"
+  },
+  "1285640730": {
+    "phone": "7182798107",
+    "source": "NYP Queens affiliated",
+    "practice": "Joseph Shim MD private (NYP Queens-affiliated)",
+    "address": "5650 Francis Lewis Blvd Fl 1, Oakland Gardens, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1124260799": {
+    "phone": "2127373301",
+    "source": "NY Orthopedics / Northwell",
+    "practice": "NY Orthopedics (Nicholas Institute)",
+    "address": "159 East 74th Street, New York, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1184114126": {
+    "phone": "5166818822",
+    "source": "Grewal Orthopedic / LIJ Valley Stream",
+    "practice": "Grewal Orthopedic and Spine Care (hospital-affiliated)",
+    "address": "Mineola / Valley Stream, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1902070725": {
+    "phone": "8666706824",
+    "source": "NYP Medical Group Queens",
+    "practice": "NewYork-Presbyterian Queens Orthopedics (hospital-owned)",
+    "address": "16303 Horace Harding Expy, Fresh Meadows, NY 11365",
+    "fetched_at": "2026-04-21"
+  },
+  "1649429853": {
+    "phone": "8107331200",
+    "source": "OrthoMichigan / McLaren Flint / Hurley",
+    "practice": "OrthoMichigan (McLaren-affiliated)",
+    "address": "4466 W Bristol Rd, Flint, MI 48507",
+    "fetched_at": "2026-04-21"
+  },
+  "1275983108": {
+    "phone": "2319355000",
+    "source": "Great Lakes Orthopaedic Center / Munson Healthcare",
+    "practice": "Great Lakes Orthopaedic Center",
+    "address": "1105 Sixth St, Traverse City, MI",
+    "fetched_at": "2026-04-21"
   }
 }
