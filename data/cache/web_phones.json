@@ -999,5 +999,96 @@
     "practice": "Associated Orthopedists of Detroit",
     "address": "24715 Little Mack Ave, St. Clair Shores, MI 48080",
     "fetched_at": "2026-04-21"
+  },
+  "1184687147": {
+    "phone": "2317331326",
+    "source": "Orthopaedic Associates of Muskegon",
+    "practice": "Orthopaedic Associates of Muskegon",
+    "address": "1400 Mercy Dr Ste 100, Muskegon, MI 49444",
+    "fetched_at": "2026-04-21"
+  },
+  "1164404356": {
+    "phone": "8106677400",
+    "source": "McLaren Lapeer / Lapeer Orthopedic",
+    "practice": "Lapeer Orthopedic & Sports Medicine (McLaren-affiliated)",
+    "address": "1307 N Main St Ste 120, Lapeer, MI 48446",
+    "fetched_at": "2026-04-21"
+  },
+  "1043574874": {
+    "phone": "2484249980",
+    "source": "Orthopedic Specialists of Michigan",
+    "practice": "Orthopedic Specialists of Michigan / Beaumont",
+    "address": "24255 13 Mile Rd Ste 200, Beverly Hills, MI 48025",
+    "fetched_at": "2026-04-21"
+  },
+  "1790709632": {
+    "phone": "2319350957",
+    "source": "Traverse City Orthopedics",
+    "practice": "Traverse City Orthopedics (Munson-affiliated)",
+    "address": "5246 N Royal Dr, Traverse City, MI 49684",
+    "fetched_at": "2026-04-21"
+  },
+  "1588635767": {
+    "phone": "5867797970",
+    "source": "Associated Orthopedists of Detroit",
+    "practice": "Associated Orthopedists of Detroit",
+    "address": "24715 Little Mack Ave, St. Clair Shores, MI 48080",
+    "fetched_at": "2026-04-21"
+  },
+  "1427264910": {
+    "phone": "2484655140",
+    "source": "Henry Ford Motor City Orthopedics",
+    "practice": "Henry Ford Motor City Orthopedics (hospital-affiliated)",
+    "address": "26850 Providence Pkwy Ste 260, Novi, MI 48374",
+    "fetched_at": "2026-04-21"
+  },
+  "1972690725": {
+    "phone": "2037971500",
+    "source": "OrthoConnecticut / Nuvance",
+    "practice": "OrthoConnecticut (Danbury Hospital-affiliated)",
+    "address": "2 Riverview Drive, Danbury, CT 06810",
+    "fetched_at": "2026-04-21"
+  },
+  "1063677185": {
+    "phone": "6103768671",
+    "source": "Orthopaedic Associates of Reading / Tower Health",
+    "practice": "Orthopaedic Associates of Reading Ltd",
+    "address": "850 Knitting Mills Way, Wyomissing, PA 19610",
+    "fetched_at": "2026-04-21"
+  },
+  "1063726446": {
+    "phone": "7173973368",
+    "source": "Orthopedic Associates of Lancaster / Penn Medicine Lancaster",
+    "practice": "Orthopedic Associates of Lancaster",
+    "address": "170 North Pointe Blvd, Lancaster, PA 17601",
+    "fetched_at": "2026-04-21"
+  },
+  "1396739694": {
+    "phone": "9083576110",
+    "source": "Summit Health / Optum",
+    "practice": "Summit Health Orthopedics (formerly Summit Medical Group / Optum)",
+    "address": "1 Diamond Hill Rd, Berkeley Heights, NJ 07922",
+    "fetched_at": "2026-04-21"
+  },
+  "1750499455": {
+    "phone": "9083576110",
+    "source": "Summit Health / Optum",
+    "practice": "Summit Health Orthopedics",
+    "address": "1 Diamond Hill Rd, Berkeley Heights, NJ 07922",
+    "fetched_at": "2026-04-21"
+  },
+  "1578523320": {
+    "phone": "7173973368",
+    "source": "Orthopedic Associates of Lancaster",
+    "practice": "Orthopedic Associates of Lancaster",
+    "address": "170 North Pointe Blvd, Lancaster, PA 17601",
+    "fetched_at": "2026-04-21"
+  },
+  "1679534903": {
+    "phone": "9083576110",
+    "source": "Summit Health / Optum",
+    "practice": "Summit Health Orthopedics",
+    "address": "1 Diamond Hill Rd, Berkeley Heights, NJ 07922",
+    "fetched_at": "2026-04-21"
   }
 }
