@@ -1090,5 +1090,131 @@
     "practice": "Summit Health Orthopedics",
     "address": "1 Diamond Hill Rd, Berkeley Heights, NJ 07922",
     "fetched_at": "2026-04-21"
+  },
+  "1477658458": {
+    "phone": "2486415900",
+    "source": "Orthopedic Institute of Michigan",
+    "practice": "Orthopedic Institute of Michigan (Beaumont-affiliated)",
+    "address": "2950 Crooks Rd Ste 200, Rochester Hills, MI 48309",
+    "fetched_at": "2026-04-21"
+  },
+  "1225264005": {
+    "phone": "2319355000",
+    "source": "Great Lakes Orthopaedic Center / Munson",
+    "practice": "Great Lakes Orthopaedic Center",
+    "address": "1105 Sixth St, Traverse City, MI 49684",
+    "fetched_at": "2026-04-21"
+  },
+  "1780819490": {
+    "phone": "2486415900",
+    "source": "Orthopedic Institute of Michigan",
+    "practice": "Orthopedic Institute of Michigan",
+    "address": "2950 Crooks Rd Ste 200, Rochester Hills, MI 48309",
+    "fetched_at": "2026-04-21"
+  },
+  "1659721926": {
+    "phone": "2314876600",
+    "source": "McLaren Northern Michigan",
+    "practice": "McLaren Northern Michigan Orthopedics (hospital-affiliated)",
+    "address": "560 W Mitchell St, Petoskey, MI 49770",
+    "fetched_at": "2026-04-21"
+  },
+  "1225349665": {
+    "phone": "5864663700",
+    "source": "Henry Ford Macomb Orthopedics",
+    "practice": "Henry Ford Macomb Orthopedics (hospital-affiliated)",
+    "address": "15959 Hall Rd Ste 400, Macomb, MI 48044",
+    "fetched_at": "2026-04-21"
+  },
+  "1780809574": {
+    "phone": "2484713670",
+    "source": "Michigan Advanced Orthopedics",
+    "practice": "Michigan Advanced Orthopedics",
+    "address": "Farmington Hills / Novi, MI",
+    "fetched_at": "2026-04-21"
+  },
+  "1215166913": {
+    "phone": "6163965855",
+    "source": "Shoreline Orthopaedics / Holland Hospital",
+    "practice": "Shoreline Orthopaedic & Sports Medicine Clinic",
+    "address": "370 N 120th Ave Ste 20, Holland, MI 49424",
+    "fetched_at": "2026-04-21"
+  },
+  "1619964673": {
+    "phone": "2034832518",
+    "source": "Connecticut Orthopaedics",
+    "practice": "Connecticut Orthopaedics (Branford)",
+    "address": "84 N Main St, Branford, CT 06405",
+    "fetched_at": "2026-04-21"
+  },
+  "1932105798": {
+    "phone": "6104363700",
+    "source": "Premier Orthopaedics / Rothman",
+    "practice": "Premier Orthopaedics & Sports Medicine",
+    "address": "491 John Young Way Ste 130, Exton, PA 19341",
+    "fetched_at": "2026-04-21"
+  },
+  "1952339731": {
+    "phone": "6105247251",
+    "source": "Premier Orthopaedics / Main Line Health",
+    "practice": "Premier Orthopaedics",
+    "address": "491 John Young Way Baxter Bldg Ste 130, Exton, PA",
+    "fetched_at": "2026-04-21"
+  },
+  "1568405439": {
+    "phone": "6104363700",
+    "source": "Premier Orthopaedics",
+    "practice": "Premier Orthopaedics",
+    "address": "Exton/West Chester, PA",
+    "fetched_at": "2026-04-21"
+  },
+  "1619975174": {
+    "phone": "6103789000",
+    "source": "Berkshire Orthopaedic Associates / Tower Health",
+    "practice": "Berkshire Orthopaedic Associates / Reading Hospital",
+    "address": "2758 Century Blvd Ste 1, Wyomissing, PA 19610",
+    "fetched_at": "2026-04-21"
+  },
+  "1487850525": {
+    "phone": "5165362800",
+    "source": "Orlin & Cohen / Northwell",
+    "practice": "Orlin & Cohen Orthopedic Group (Syosset)",
+    "address": "315 West Jericho Turnpike, Syosset, NY 11791",
+    "fetched_at": "2026-04-21"
+  },
+  "1801867684": {
+    "phone": "7162509999",
+    "source": "Excelsior Orthopaedics",
+    "practice": "Excelsior Orthopaedics",
+    "address": "3925 Sheridan Dr, Amherst, NY 14226",
+    "fetched_at": "2026-04-21"
+  },
+  "1609854215": {
+    "phone": "9788186350",
+    "source": "Lahey Health / Sports Medicine North",
+    "practice": "Sports Medicine North Orthopedic Specialty Center (Lahey-affiliated)",
+    "address": "1 Orthopedics Dr, Peabody, MA 01960",
+    "fetched_at": "2026-04-21"
+  },
+  "1336382373": {
+    "phone": "5087758282",
+    "source": "Cape Cod Orthopaedics / Cape Cod Healthcare",
+    "practice": "Cape Cod Orthopaedics and Sports Medicine",
+    "address": "130 North St, Hyannis, MA 02601",
+    "fetched_at": "2026-04-21"
+  },
+  "1790724334": {
+    "phone": "2038691145",
+    "source": "ONS / Stamford Health",
+    "practice": "Orthopaedic & Neurosurgery Specialists (ONS)",
+    "address": "6 Greenwich Office Park, Greenwich, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1861574568": {
+    "phone": "9142411050",
+    "source": "Optum/Caremount",
+    "practice": "Optum Medical Care PC (formerly Caremount)",
+    "address": "90 S Bedford Rd, Mount Kisco, NY 10549",
+    "fetched_at": "2026-04-21"
   }
 }
