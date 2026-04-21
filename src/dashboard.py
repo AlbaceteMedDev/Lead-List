@@ -544,13 +544,13 @@ function procedureVolume(row) {
 function phonePillCell(row) {
   const phone = row['Verified Phone'] || '';
   const status = row['Phone Status'] || '';
-  if (!phone) return '<span class="pill red">Missing</span>';
+  if (!phone) return '<span class="pill red">No phone</span>';
   let kind = 'navy';
   let tag = 'Unverified';
   if (status === 'Verified') { kind = 'green'; tag = 'NPPES-verified'; }
   else if (status === 'Added from NPPES') { kind = 'amber'; tag = 'NPPES-added'; }
   else if (status === 'Updated (NPPES differs)') { kind = 'amber'; tag = 'NPPES-updated'; }
-  else if (status === 'Missing') { kind = 'red'; tag = 'Missing'; }
+  else if (status === 'Missing') { kind = 'navy'; tag = 'AcuityMD (unverified)'; }
   return escapeHtml(phone) + '<br><span class="pill ' + kind + '">' + tag + '</span>';
 }
 
