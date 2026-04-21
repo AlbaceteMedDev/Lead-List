@@ -152,6 +152,8 @@ def _dataset(df: pd.DataFrame) -> list[dict]:
         "Email", "Email Status", "Verified Phone", "Phone Status",
         "Primary Site of Care", "Practice Type", "City", "State",
         "Tier", "MAC Jurisdiction", "Microlyte Eligible",
+        "Address 1", "Postal Code",
+        "Other Locations", "Location Count",
         "Product Line", "Lead Priority", "Lead Status", "Target Tier", "Target Score",
         "Lg Incision Likelihood", "Next Action", "Next Action Date",
         "Last Touch Date", "Touch Count",
@@ -537,6 +539,36 @@ function procedureVolume(row) {
   return num(row['Joint Repl Vol']) || num(row['Open Spine Vol']) || num(row['Procedure Vol']);
 }
 
+function phonePillCell(row) {
+  const phone = row['Verified Phone'] || '';
+  const status = row['Phone Status'] || '';
+  if (!phone) return '<span class="pill red">Missing</span>';
+  let kind = 'navy';
+  let tag = 'Unverified';
+  if (status === 'Verified') { kind = 'green'; tag = 'NPPES-verified'; }
+  else if (status === 'Added from NPPES') { kind = 'amber'; tag = 'NPPES-added'; }
+  else if (status === 'Updated (NPPES differs)') { kind = 'amber'; tag = 'NPPES-updated'; }
+  else if (status === 'Missing') { kind = 'red'; tag = 'Missing'; }
+  return escapeHtml(phone) + '<br><span class="pill ' + kind + '">' + tag + '</span>';
+}
+
+function emailPillCell(row) {
+  const email = row['Email'] || '';
+  const status = row['Email Status'] || '';
+  if (!email) return '<span class="pill red">Missing</span>';
+  let kind = 'navy';
+  let tag = 'Review';
+  if (status.indexOf('Verified') !== -1) { kind = 'green'; tag = 'High'; }
+  else if (status === 'Hospital System Email') { kind = 'green'; tag = 'Hospital'; }
+  else if (status.indexOf('Inferred') !== -1) { kind = 'amber'; tag = 'Inferred (med)'; }
+  else if (status === 'Personal Email (name match)') { kind = 'amber'; tag = 'Personal'; }
+  else if (status === 'Personal Email (no name match)') { kind = 'red'; tag = 'Personal?'; }
+  else if (status === 'Generic Office Email') { kind = 'red'; tag = 'Generic'; }
+  else if (status === 'Practice Email (review recommended)') { kind = 'amber'; tag = 'Review'; }
+  else if (status === 'Missing') { kind = 'red'; tag = 'Missing'; }
+  return escapeHtml(email) + '<br><span class="pill ' + kind + '">' + tag + '</span>';
+}
+
 function collagenVolume(row) {
   if (row['Total Collagen Vol']) return num(row['Total Collagen Vol']);
   return num(row['Lg Collagen Vol']) + num(row['Sm/Md Collagen Vol']) + num(row['Collagen Powder Vol']);
@@ -587,8 +619,8 @@ function render() {
       escapeHtml((eff['Tier'] || '').replace(' (', '\n(')),
       targetPill(eff['Target Tier']),
       statusPill(eff['Lead Status']),
-      escapeHtml(eff['Verified Phone'] || ''),
-      escapeHtml(eff['Email'] || ''),
+      phonePillCell(eff),
+      emailPillCell(eff),
       procedureVolume(eff).toLocaleString(),
       collagenVolume(eff).toLocaleString(),
       escapeHtml(t.last),
@@ -702,12 +734,31 @@ function buildDrawerBody(row) {
   }
   sections.push('<section><h3>Verification</h3>'
     + '<div class="field"><label>Practice Type</label><span>' + escapeHtml(eff['Practice Type'] || '') + '</span></div>'
+    + '<div class="field"><label>Primary Site</label><span>' + escapeHtml(eff['Primary Site of Care'] || '') + '</span></div>'
+    + '<div class="field"><label>Address</label><span>' + escapeHtml([eff['Address 1'] || '', eff['City'] || '', eff['State'] || '', eff['Postal Code'] || ''].filter(x => x).join(', ')) + '</span></div>'
     + '<div class="field"><label>Drive Tier (NYC)</label><span>' + escapeHtml(eff['Tier'] || '') + '</span></div>'
     + '<div class="field"><label>Phone</label><span>' + escapeHtml(eff['Verified Phone'] || '(none)') + ' - ' + escapeHtml(eff['Phone Status'] || '') + '</span></div>'
     + '<div class="field"><label>Email</label><span>' + escapeHtml(eff['Email'] || '(none)') + ' - ' + escapeHtml(eff['Email Status'] || '') + '</span></div>'
     + '<div class="field"><label>MAC / Microlyte</label><span>' + escapeHtml(eff['MAC Jurisdiction'] || '') + ' / ' + escapeHtml(eff['Microlyte Eligible'] || '') + '</span></div>'
     + '<div class="field"><label>Incision Likelihood</label><span>' + escapeHtml(eff['Lg Incision Likelihood'] || '') + '</span></div>'
     + '</section>');
+
+  if (eff['Other Locations']) {
+    try {
+      const others = JSON.parse(eff['Other Locations']);
+      if (others.length > 0) {
+        const rows = others.map(l =>
+          '<div style="padding:6px 0;border-bottom:1px dashed var(--line);font-size:12px;">'
+          + '<div style="font-weight:600;">' + escapeHtml(l.site || '(no practice name)') + '</div>'
+          + '<div class="muted">' + escapeHtml([l.address, l.city, l.state, l.zip].filter(x => x).join(', ')) + '</div>'
+          + (l.phone ? '<div class="muted">📞 ' + escapeHtml(l.phone) + '</div>' : '')
+          + (l.email ? '<div class="muted">✉️ ' + escapeHtml(l.email) + '</div>' : '')
+          + '</div>'
+        ).join('');
+        sections.push('<section><h3>Secondary Locations (' + others.length + ')</h3>' + rows + '</section>');
+      }
+    } catch(e) {}
+  }
   if (eff['Target Tier Reason']) {
     sections.push('<section><h3>Why this grade (' + escapeHtml(eff['Target Tier'] || '') + ')</h3>'
       + '<div style="font-size:12px;color:var(--ink);background:#f7f9fa;padding:10px;border-radius:4px;white-space:pre-wrap;">'
