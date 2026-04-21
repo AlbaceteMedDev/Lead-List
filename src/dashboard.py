@@ -150,6 +150,7 @@ def _dataset(df: pd.DataFrame) -> list[dict]:
     cols = [
         "HCP NPI", "First Name", "Last Name", "Credential", "Specialty",
         "Email", "Email Status", "Verified Phone", "Phone Status",
+        "NPPES Phone", "Phone Number",
         "Primary Site of Care", "Practice Type", "City", "State",
         "Tier", "MAC Jurisdiction", "Microlyte Eligible",
         "Address 1", "Postal Code",
@@ -542,16 +543,17 @@ function procedureVolume(row) {
 }
 
 function phonePillCell(row) {
-  const phone = row['Verified Phone'] || '';
-  const status = row['Phone Status'] || '';
-  if (!phone) return '<span class="pill red">No phone</span>';
-  let kind = 'navy';
-  let tag = 'Unverified';
-  if (status === 'Verified') { kind = 'green'; tag = 'NPPES-verified'; }
-  else if (status === 'Added from NPPES') { kind = 'amber'; tag = 'NPPES-added'; }
-  else if (status === 'Updated (NPPES differs)') { kind = 'amber'; tag = 'NPPES-updated'; }
-  else if (status === 'Missing') { kind = 'navy'; tag = 'AcuityMD (unverified)'; }
-  return escapeHtml(phone) + '<br><span class="pill ' + kind + '">' + tag + '</span>';
+  const nppes = (row['NPPES Phone'] || '').replace(/\D/g, '');
+  const acuity = (row['Phone Number'] || '').replace(/\D/g, '');
+  const pieces = [];
+  if (nppes) {
+    pieces.push('<div><span class="pill green">NPPES</span> ' + escapeHtml(nppes) + '</div>');
+  }
+  if (acuity && acuity !== nppes) {
+    pieces.push('<div><span class="pill navy">Acuity</span> ' + escapeHtml(acuity) + '</div>');
+  }
+  if (!pieces.length) return '<span class="pill red">No phone</span>';
+  return pieces.join('');
 }
 
 function emailPillCell(row) {
@@ -739,7 +741,8 @@ function buildDrawerBody(row) {
     + '<div class="field"><label>Primary Site</label><span>' + escapeHtml(eff['Primary Site of Care'] || '') + '</span></div>'
     + '<div class="field"><label>Address</label><span>' + escapeHtml([eff['Address 1'] || '', eff['City'] || '', eff['State'] || '', eff['Postal Code'] || ''].filter(x => x).join(', ')) + '</span></div>'
     + '<div class="field"><label>Drive Tier (NYC)</label><span>' + escapeHtml(eff['Tier'] || '') + '</span></div>'
-    + '<div class="field"><label>Phone</label><span>' + escapeHtml(eff['Verified Phone'] || '(none)') + ' - ' + escapeHtml(eff['Phone Status'] || '') + '</span></div>'
+    + (eff['NPPES Phone'] ? '<div class="field"><label>NPPES Phone</label><span>' + escapeHtml(eff['NPPES Phone']) + '</span></div>' : '')
+    + (eff['Phone Number'] && eff['Phone Number'].replace(/\D/g, '') !== (eff['NPPES Phone'] || '').replace(/\D/g, '') ? '<div class="field"><label>Acuity Phone</label><span>' + escapeHtml(eff['Phone Number']) + '</span></div>' : '')
     + (eff['Alternate Phones'] ? '<div class="field"><label>Alt. Phones</label><span>' + escapeHtml(eff['Alternate Phones']) + '</span></div>' : '')
     + '<div class="field"><label>Email</label><span>' + escapeHtml(eff['Email'] || '(none)') + ' - ' + escapeHtml(eff['Email Status'] || '') + '</span></div>'
     + '<div class="field"><label>MAC / Microlyte</label><span>' + escapeHtml(eff['MAC Jurisdiction'] || '') + ' / ' + escapeHtml(eff['Microlyte Eligible'] || '') + '</span></div>'
