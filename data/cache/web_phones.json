@@ -1216,5 +1216,145 @@
     "practice": "Optum Medical Care PC (formerly Caremount)",
     "address": "90 S Bedford Rd, Mount Kisco, NY 10549",
     "fetched_at": "2026-04-21"
+  },
+  "1437204328": {
+    "phone": "5086550471",
+    "source": "Orthopedics New England",
+    "practice": "Orthopedics New England",
+    "address": "313 Speen Street, Natick, MA 01760",
+    "fetched_at": "2026-04-21"
+  },
+  "1750371308": {
+    "phone": "5184892663",
+    "source": "OrthoNY",
+    "practice": "OrthoNY",
+    "address": "12 Route 30, Amsterdam, NY 12010",
+    "fetched_at": "2026-04-21"
+  },
+  "1194718320": {
+    "phone": "7814595544",
+    "source": "Norwood Orthopedic / Ethos Orthopedics",
+    "practice": "Ethos Orthopedics Norwood",
+    "address": "825 Washington St Ste 230, Norwood, MA 02062",
+    "fetched_at": "2026-04-21"
+  },
+  "1144214032": {
+    "phone": "7812797040",
+    "source": "Agility Orthopedics / Lahey",
+    "practice": "Agility Orthopedics",
+    "address": "92 Montvale Ave Ste 1400, Stoneham, MA 02180",
+    "fetched_at": "2026-04-21"
+  },
+  "1063517175": {
+    "phone": "7168873333",
+    "source": "Buffalo Medical Group",
+    "practice": "Buffalo Medical Group Orthopedic Surgery",
+    "address": "325 Essjay Rd, Williamsville, NY 14221",
+    "fetched_at": "2026-04-21"
+  },
+  "1316920481": {
+    "phone": "3157821500",
+    "source": "Watertown Orthopedics / Samaritan Medical",
+    "practice": "Watertown Orthopedics",
+    "address": "830 Washington St, Watertown, NY 13601",
+    "fetched_at": "2026-04-21"
+  },
+  "1285669218": {
+    "phone": "5857232842",
+    "source": "Rochester Regional Health",
+    "practice": "Rochester Regional Health Orthopedics (hospital-affiliated)",
+    "address": "30 Hagen Dr Ste 110, Rochester, NY 14625",
+    "fetched_at": "2026-04-21"
+  },
+  "1548766736": {
+    "phone": "9142411050",
+    "source": "Optum/Caremount",
+    "practice": "Optum Medical Care PC",
+    "address": "90 S Bedford Rd, Mount Kisco, NY 10549",
+    "fetched_at": "2026-04-21"
+  },
+  "1831331057": {
+    "phone": "5857232842",
+    "source": "Rochester Regional Health",
+    "practice": "Rochester Regional Health Orthopedics (hospital-affiliated)",
+    "address": "30 Hagen Dr, Rochester, NY 14625",
+    "fetched_at": "2026-04-21"
+  },
+  "1356498489": {
+    "phone": "5086550471",
+    "source": "Orthopedics New England",
+    "practice": "Orthopedics New England",
+    "address": "313 Speen Street, Natick, MA 01760",
+    "fetched_at": "2026-04-21"
+  },
+  "1477535896": {
+    "phone": "9787775111",
+    "source": "North Shore Orthopedics",
+    "practice": "North Shore Orthopedic Surgery",
+    "address": "480 Maple St Ste 102, Danvers, MA",
+    "fetched_at": "2026-04-21"
+  },
+  "1386664480": {
+    "phone": "2038691145",
+    "source": "ONS / Stamford Health",
+    "practice": "Orthopaedic & Neurosurgery Specialists (ONS)",
+    "address": "6 Greenwich Office Park, Greenwich, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1396192647": {
+    "phone": "6316948772",
+    "source": "Huntington Medical / Northwell",
+    "practice": "Huntington Orthopaedic Surgery (Huntington Hospital-affiliated)",
+    "address": "270 Park Ave, Huntington, NY 11743",
+    "fetched_at": "2026-04-21"
+  },
+  "1114169331": {
+    "phone": "5853419100",
+    "source": "University of Rochester Medicine",
+    "practice": "URMC Orthopaedics (hospital-owned)",
+    "address": "4901 Lac de Ville Blvd, Rochester, NY",
+    "fetched_at": "2026-04-21"
+  },
+  "1568781268": {
+    "phone": "6316542300",
+    "source": "Island Orthopaedics Associates",
+    "practice": "Island Orthopaedics Associates",
+    "address": "176 Oser Ave, Hauppauge, NY 11788",
+    "fetched_at": "2026-04-21"
+  },
+  "1669413480": {
+    "phone": "3152513100",
+    "source": "Syracuse Orthopedic Specialists",
+    "practice": "Syracuse Orthopedic Specialists (SOS)",
+    "address": "5719 Widewaters Pkwy, East Syracuse, NY 13214",
+    "fetched_at": "2026-04-21"
+  },
+  "1982633483": {
+    "phone": "7813375555",
+    "source": "South Shore Orthopedics",
+    "practice": "South Shore Orthopedics (South Shore Health)",
+    "address": "2 Pond Park Rd Ste 102, Hingham, MA 02043",
+    "fetched_at": "2026-04-21"
+  },
+  "1689011835": {
+    "phone": "9788186350",
+    "source": "Lahey Health / Sports Medicine North",
+    "practice": "Sports Medicine North Orthopedic Specialty Center",
+    "address": "1 Orthopedics Dr, Peabody, MA 01960",
+    "fetched_at": "2026-04-21"
+  },
+  "1578536025": {
+    "phone": "2038691145",
+    "source": "ONS / Greenwich Hospital",
+    "practice": "Orthopaedic & Neurosurgery Specialists (ONS)",
+    "address": "6 Greenwich Office Park, Greenwich, CT",
+    "fetched_at": "2026-04-21"
+  },
+  "1821054057": {
+    "phone": "7167579835",
+    "source": "Excelsior Orthopaedics",
+    "practice": "Excelsior Orthopaedics",
+    "address": "3925 Sheridan Dr, Amherst, NY 14226 (Orchard Park office)",
+    "fetched_at": "2026-04-21"
   }
 }
