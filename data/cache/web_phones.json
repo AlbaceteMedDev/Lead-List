@@ -929,5 +929,75 @@
     "practice": "Great Lakes Orthopaedic Center",
     "address": "1105 Sixth St, Traverse City, MI",
     "fetched_at": "2026-04-21"
+  },
+  "1821447020": {
+    "phone": "6163965855",
+    "source": "Shoreline Orthopaedics / Corewell / Holland Hospital",
+    "practice": "Shoreline Orthopaedic & Sports Medicine Clinic PLC",
+    "address": "370 120th Ave, Holland, MI 49424",
+    "fetched_at": "2026-04-21"
+  },
+  "1720076219": {
+    "phone": "6164592231",
+    "source": "Orthopaedic Associates of Michigan",
+    "practice": "Orthopaedic Associates of Michigan",
+    "address": "1111 Leffingwell Ave NE, Grand Rapids, MI",
+    "fetched_at": "2026-04-21"
+  },
+  "1104866839": {
+    "phone": "2317331326",
+    "source": "Orthopaedic Associates of Muskegon / Trinity Health",
+    "practice": "Orthopaedic Associates of Muskegon",
+    "address": "1400 Mercy Dr Ste 100, Muskegon, MI 49444",
+    "fetched_at": "2026-04-21"
+  },
+  "1053538868": {
+    "phone": "2319350957",
+    "source": "Traverse City Orthopedics / Munson",
+    "practice": "Traverse City Orthopedics",
+    "address": "5246 N Royal Dr, Traverse City, MI 49684",
+    "fetched_at": "2026-04-21"
+  },
+  "1033236823": {
+    "phone": "8107331200",
+    "source": "OrthoMichigan / McLaren Flint",
+    "practice": "OrthoMichigan (McLaren-affiliated)",
+    "address": "4466 W Bristol Rd, Flint, MI 48507",
+    "fetched_at": "2026-04-21"
+  },
+  "1669583332": {
+    "phone": "9899539777",
+    "source": "Central Michigan Orthopaedics / McLaren",
+    "practice": "Central Michigan Orthopaedics (McLaren-affiliated)",
+    "address": "2890 Health Pkwy, Mount Pleasant, MI",
+    "fetched_at": "2026-04-21"
+  },
+  "1649409020": {
+    "phone": "8109854900",
+    "source": "Orthopedic Associates of Port Huron",
+    "practice": "Orthopedic Associates of Port Huron",
+    "address": "940 River Centre Drive, Port Huron, MI 48060",
+    "fetched_at": "2026-04-21"
+  },
+  "1386763928": {
+    "phone": "3138876000",
+    "source": "Corewell Health",
+    "practice": "Corewell Health Orthopedics (hospital-owned)",
+    "address": "10000 Telegraph Rd Ste 100, Taylor, MI 48180",
+    "fetched_at": "2026-04-21"
+  },
+  "1346535655": {
+    "phone": "9897547200",
+    "source": "Weir Orthopaedics",
+    "practice": "Weir Orthopaedics",
+    "address": "800 Cooper Ave Ste 12, Saginaw, MI 48602",
+    "fetched_at": "2026-04-21"
+  },
+  "1780655969": {
+    "phone": "5867797970",
+    "source": "Associated Orthopedists of Detroit / Henry Ford",
+    "practice": "Associated Orthopedists of Detroit",
+    "address": "24715 Little Mack Ave, St. Clair Shores, MI 48080",
+    "fetched_at": "2026-04-21"
   }
 }
