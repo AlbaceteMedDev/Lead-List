@@ -73,6 +73,13 @@ def parse_response(payload: dict) -> dict:
         "nppes_credential": "",
         "nppes_taxonomy": "",
         "nppes_status": "",
+        "nppes_address_1": "",
+        "nppes_address_2": "",
+        "nppes_city": "",
+        "nppes_state": "",
+        "nppes_zip": "",
+        "nppes_mailing_phone": "",
+        "nppes_mailing_address": "",
         "nppes_found": False,
     }
     if not payload or not isinstance(payload, dict):
@@ -86,12 +93,29 @@ def parse_response(payload: dict) -> dict:
     basic = rec.get("basic") or {}
     out["nppes_credential"] = (basic.get("credential") or "").strip()
     out["nppes_status"] = (basic.get("status") or "").strip()
+    out["nppes_mailing_phone"] = ""
+    out["nppes_mailing_address"] = ""
 
     for addr in rec.get("addresses") or []:
-        if (addr.get("address_purpose") or "").upper() == "LOCATION":
+        purpose = (addr.get("address_purpose") or "").upper()
+        if purpose == "LOCATION" and not out["nppes_phone"]:
             out["nppes_phone"] = normalize_phone(addr.get("telephone_number"))
             out["nppes_fax"] = normalize_phone(addr.get("fax_number"))
-            break
+            out["nppes_address_1"] = (addr.get("address_1") or "").strip()
+            out["nppes_address_2"] = (addr.get("address_2") or "").strip()
+            out["nppes_city"] = (addr.get("city") or "").strip()
+            out["nppes_state"] = (addr.get("state") or "").strip()
+            out["nppes_zip"] = (addr.get("postal_code") or "").strip()[:5]
+        elif purpose == "MAILING":
+            out["nppes_mailing_phone"] = normalize_phone(addr.get("telephone_number"))
+            out["nppes_mailing_address"] = ", ".join(
+                x for x in [
+                    (addr.get("address_1") or "").strip(),
+                    (addr.get("city") or "").strip(),
+                    (addr.get("state") or "").strip(),
+                    (addr.get("postal_code") or "").strip()[:5],
+                ] if x
+            )
 
     for tax in rec.get("taxonomies") or []:
         if tax.get("primary"):
@@ -135,7 +159,15 @@ def fetch_many(npis: list[str], cache_path: Path, force: bool = False, cache_onl
         if not npi:
             continue
         cached = cache.get(npi)
-        if cached and not force and _cache_entry_fresh(cached):
+        cached_is_fresh_format = (
+            cached
+            and _cache_entry_fresh(cached)
+            and (
+                not cached["data"].get("nppes_found")
+                or "nppes_address_1" in cached["data"]
+            )
+        )
+        if cached and not force and cached_is_fresh_format:
             out[npi] = cached["data"]
             continue
         if cache_only:
@@ -190,6 +222,66 @@ def enrich_frame(df: pd.DataFrame, cache_path: Path, force: bool = False, cache_
     df["NPPES Credential"] = df["HCP NPI"].map(lambda n: _row(n)["nppes_credential"])
     df["NPPES Taxonomy"] = df["HCP NPI"].map(lambda n: _row(n)["nppes_taxonomy"])
     df["NPPES Status"] = df["HCP NPI"].map(lambda n: _row(n)["nppes_status"])
+    df["NPPES Address 1"] = df["HCP NPI"].map(lambda n: _row(n).get("nppes_address_1", ""))
+    df["NPPES City"] = df["HCP NPI"].map(lambda n: _row(n).get("nppes_city", ""))
+    df["NPPES State"] = df["HCP NPI"].map(lambda n: _row(n).get("nppes_state", ""))
+    df["NPPES Zip"] = df["HCP NPI"].map(lambda n: _row(n).get("nppes_zip", ""))
+
+    def _zip5(v):
+        s = "".join(c for c in str(v or "") if c.isdigit())
+        return s[:5]
+
+    def _practice_match(row):
+        nz = _zip5(row.get("NPPES Zip", ""))
+        az = _zip5(row.get("Postal Code", ""))
+        nc = str(row.get("NPPES City", "") or "").strip().lower()
+        ac = str(row.get("City", "") or "").strip().lower()
+        if not row.get("NPPES Found"):
+            return "Unknown (no NPPES record yet)"
+        if not nz and not nc:
+            return "Unknown (no NPPES address)"
+        if nz and az and nz == az and nc == ac:
+            return "Match"
+        if nz and az and nz == az:
+            return "Match (same zip)"
+        return "Different (likely multi-affiliation)"
+
+    df["Practice Match"] = df.apply(_practice_match, axis=1)
+    df["NPPES Practice Address"] = df.apply(
+        lambda r: ", ".join(x for x in [r.get("NPPES Address 1", ""), r.get("NPPES City", ""), r.get("NPPES State", ""), r.get("NPPES Zip", "")] if x),
+        axis=1,
+    )
+
+    df["NPPES Mailing Phone"] = df["HCP NPI"].map(lambda n: _row(n).get("nppes_mailing_phone", ""))
+    df["NPPES Mailing Address"] = df["HCP NPI"].map(lambda n: _row(n).get("nppes_mailing_address", ""))
+
+    def _alt_phones(row):
+        """Return distinct alternate phone numbers (not the primary Verified Phone)
+        that don't look like they go to a hospital main line for a Private Practice lead.
+        """
+        primary = normalize_phone(row.get("Verified Phone", ""))
+        seen = {primary} if primary else set()
+        alts: list[tuple[str, str]] = []
+
+        orig = normalize_phone(row.get("Phone Number", ""))
+        if orig and orig not in seen:
+            seen.add(orig)
+            alts.append((orig, "AcuityMD"))
+
+        mail = normalize_phone(row.get("NPPES Mailing Phone", ""))
+        if mail and mail not in seen:
+            seen.add(mail)
+            mail_addr = (row.get("NPPES Mailing Address") or "").lower()
+            is_hospital_line = (
+                row.get("Practice Type") == "Private Practice"
+                and any(w in mail_addr for w in ("hospital", "medical center", "health system"))
+            )
+            if not is_hospital_line:
+                alts.append((mail, "NPPES mailing"))
+
+        return " | ".join(f"{p} ({src})" for p, src in alts)
+
+    df["Alternate Phones"] = df.apply(_alt_phones, axis=1)
 
     original_phone = df["Phone Number"] if "Phone Number" in df.columns else pd.Series([""] * len(df))
     verified, status = [], []

@@ -154,6 +154,8 @@ def _dataset(df: pd.DataFrame) -> list[dict]:
         "Tier", "MAC Jurisdiction", "Microlyte Eligible",
         "Address 1", "Postal Code",
         "Other Locations", "Location Count",
+        "Practice Match", "NPPES Practice Address",
+        "Alternate Phones",
         "Product Line", "Lead Priority", "Lead Status", "Target Tier", "Target Score",
         "Lg Incision Likelihood", "Next Action", "Next Action Date",
         "Last Touch Date", "Touch Count",
@@ -738,10 +740,23 @@ function buildDrawerBody(row) {
     + '<div class="field"><label>Address</label><span>' + escapeHtml([eff['Address 1'] || '', eff['City'] || '', eff['State'] || '', eff['Postal Code'] || ''].filter(x => x).join(', ')) + '</span></div>'
     + '<div class="field"><label>Drive Tier (NYC)</label><span>' + escapeHtml(eff['Tier'] || '') + '</span></div>'
     + '<div class="field"><label>Phone</label><span>' + escapeHtml(eff['Verified Phone'] || '(none)') + ' - ' + escapeHtml(eff['Phone Status'] || '') + '</span></div>'
+    + (eff['Alternate Phones'] ? '<div class="field"><label>Alt. Phones</label><span>' + escapeHtml(eff['Alternate Phones']) + '</span></div>' : '')
     + '<div class="field"><label>Email</label><span>' + escapeHtml(eff['Email'] || '(none)') + ' - ' + escapeHtml(eff['Email Status'] || '') + '</span></div>'
     + '<div class="field"><label>MAC / Microlyte</label><span>' + escapeHtml(eff['MAC Jurisdiction'] || '') + ' / ' + escapeHtml(eff['Microlyte Eligible'] || '') + '</span></div>'
     + '<div class="field"><label>Incision Likelihood</label><span>' + escapeHtml(eff['Lg Incision Likelihood'] || '') + '</span></div>'
+    + (eff['Practice Match'] ? '<div class="field"><label>Practice Match</label><span>' + escapeHtml(eff['Practice Match']) + '</span></div>' : '')
+    + (eff['NPPES Practice Address'] ? '<div class="field"><label>NPPES Practice</label><span>' + escapeHtml(eff['NPPES Practice Address']) + '</span></div>' : '')
     + '</section>');
+
+  if (eff['Practice Match'] && eff['Practice Match'].indexOf('Different') !== -1) {
+    sections.push('<section><h3 style="color:#d68910;">⚠️ Multi-Affiliation Flag</h3>'
+      + '<div style="background:#fef9e7;border:1px solid #f9e79f;padding:10px;border-radius:4px;font-size:12px;">'
+      + '<strong>This doctor likely has multiple practice locations.</strong><br>'
+      + 'AcuityMD lists them at <em>' + escapeHtml(eff['Primary Site of Care'] || '') + '</em> in ' + escapeHtml(eff['City'] || '') + ', ' + escapeHtml(eff['State'] || '') + '.<br>'
+      + 'NPPES has them at <em>' + escapeHtml(eff['NPPES Practice Address'] || '') + '</em>.<br>'
+      + 'Worth asking which one they spend most of their OR time at when you call.'
+      + '</div></section>');
+  }
 
   if (eff['Other Locations']) {
     try {
