@@ -30,7 +30,7 @@ from typing import Iterable
 import pandas as pd
 
 from src import (
-    classify, dashboard, email_enrich, export, ingest, mac_mapping, nppes,
+    classify, dashboard, email_enrich, export, ingest, mac_mapping, mobile, nppes,
     outreach, routing, scoring, tier, tracking, web_phones,
 )
 
@@ -154,9 +154,11 @@ def main(argv: list[str] | None = None) -> int:
     stamp = datetime.utcnow().strftime("%Y%m%d_%H%M")
     xlsx_path = args.output_dir / f"{Path(args.output).stem}_{stamp}.xlsx"
     dash_path = args.output_dir / f"{Path(args.dashboard).stem}_{stamp}.html"
+    mobile_path = args.output_dir / f"mobile_{stamp}.html"
 
     export.write_workbook(df, xlsx_path)
     dashboard.write_dashboard(df, dash_path)
+    mobile.write_mobile(df, mobile_path)
 
     log.info("Pipeline complete: %d leads -> %s", len(df), xlsx_path.name)
     log.info("Dashboard: %s", dash_path.name)
