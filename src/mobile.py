@@ -121,6 +121,16 @@ _HTML_TEMPLATE = r"""<!doctype html>
   .sheet-foot button { flex: 1; font: inherit; font-size: 14px; font-weight: 600; padding: 12px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); }
   .sheet-foot button.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
 
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .act-btn { display: flex; align-items: center; justify-content: center; gap: 6px; font: inherit; font-size: 13px; font-weight: 600; padding: 12px 10px; border-radius: 8px; border: 1px solid var(--navy); background: var(--navy); color: #fff; cursor: pointer; text-decoration: none; text-align: center; }
+  .act-btn.ghost { background: #fff; color: var(--navy); border-color: var(--line); }
+  .act-btn:active { opacity: 0.7; }
+
+  .history-item { padding: 8px 10px; background: #f7f9fa; border-radius: 8px; margin-bottom: 6px; }
+  .history-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; }
+  .history-row .lbl { color: var(--muted); font-weight: 600; }
+  .history-note { font-size: 12px; color: var(--ink); margin-top: 4px; white-space: pre-wrap; }
+
   .toast { position: fixed; top: calc(env(safe-area-inset-top) + 60px); left: 16px; right: 16px; background: var(--green); color: #fff; padding: 12px 16px; border-radius: 10px; z-index: 20; transform: translateY(-120%); transition: transform 0.25s ease; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   .toast.show { transform: translateY(0); }
 
@@ -317,7 +327,7 @@ function render() {
       + '<button class="card-log">📞 Log Call</button>'
       + '<button class="card-open">View</button>'
       + '</div>';
-    card.querySelector('.card-log').addEventListener('click', ev => { ev.stopPropagation(); openSheet(raw['HCP NPI'], 'log'); });
+    card.querySelector('.card-log').addEventListener('click', ev => { ev.stopPropagation(); openSheet(raw['HCP NPI'], 'logcall'); });
     card.querySelector('.card-open').addEventListener('click', () => openSheet(raw['HCP NPI'], 'view'));
     feed.appendChild(card);
   }
@@ -344,6 +354,8 @@ let currentMode = 'view';
 
 function todayIso() { const d = new Date(); d.setHours(12); return d.toISOString().slice(0,10); }
 
+const EMAIL_OUTCOMES = ['','Sent','Bounced','Opened','Replied - Interested','Replied - Not Interested','Meeting Booked','Unsubscribed'];
+
 function openSheet(npi, mode) {
   currentNpi = npi; currentMode = mode || 'view';
   const raw = ROW_BY_NPI[npi];
@@ -353,7 +365,7 @@ function openSheet(npi, mode) {
   document.getElementById('sh-sub').innerHTML = escHtml(e['Primary Site of Care'] || '') + ' · ' + escHtml(e['City'] || '') + ', ' + escHtml(e['State'] || '') + ' · ' + escHtml(e['Specialty'] || '');
 
   let html = '';
-  if (currentMode === 'log') {
+  if (currentMode === 'logcall') {
     html += '<section class="log-form">'
       + '<h3>Log a call</h3>'
       + '<label>Date</label><div class="date-row"><input type="date" id="f-date" value="' + todayIso() + '" /><button data-d="0">Today</button><button data-d="-1">Yesterday</button></div>'
@@ -365,8 +377,99 @@ function openSheet(npi, mode) {
       + LEAD_STATUSES.map(s => '<option value="' + escHtml(s) + '">' + (s || '(leave unchanged)') + '</option>').join('')
       + '</select>'
       + '</section>';
+  } else if (currentMode === 'logemail') {
+    html += '<section class="log-form">'
+      + '<h3>Log an email</h3>'
+      + '<label>Date</label><div class="date-row"><input type="date" id="f-date" value="' + todayIso() + '" /><button data-d="0">Today</button><button data-d="-1">Yesterday</button></div>'
+      + '<label>Outcome</label><select id="f-outcome">'
+      + EMAIL_OUTCOMES.map(o => '<option value="' + escHtml(o) + '">' + (o || '(pick)') + '</option>').join('')
+      + '</select>'
+      + '<label>Subject</label><input id="f-subject" value="' + escHtml(e['Subject Line'] || '') + '" />'
+      + '<label>Notes</label><textarea id="f-notes" placeholder="Response, follow-up, etc."></textarea>'
+      + '<label>Update Lead Status</label><select id="f-status">'
+      + LEAD_STATUSES.map(s => '<option value="' + escHtml(s) + '">' + (s || '(leave unchanged)') + '</option>').join('')
+      + '</select>'
+      + '</section>';
+  } else if (currentMode === 'appointment') {
+    html += '<section class="log-form">'
+      + '<h3>Schedule appointment</h3>'
+      + '<label>Appointment Date</label><div class="date-row"><input type="date" id="f-appt-date" value="' + todayIso() + '" /></div>'
+      + '<label>Next Action Description</label><input id="f-action" placeholder="e.g. Lunch & learn at their office" />'
+      + '<label>Set Lead Status</label><select id="f-status">'
+      + LEAD_STATUSES.map(s => '<option value="' + escHtml(s) + '"' + (s === 'Meeting Booked' ? ' selected' : '') + '>' + (s || '(leave unchanged)') + '</option>').join('')
+      + '</select>'
+      + '</section>';
   }
+
+  // Quick actions toolbar
+  const emailTo = (e['Email'] || '').trim();
+  const subj = encodeURIComponent(e['Subject Line'] || '');
+  const body = encodeURIComponent(e['Draft Email'] || '');
+  const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(emailTo) + '&su=' + subj + '&body=' + body;
+  const mailto = 'mailto:' + encodeURIComponent(emailTo) + '?subject=' + subj + '&body=' + body;
+  html += '<section><h3>Actions</h3>'
+    + '<div class="action-grid">'
+    + '<button class="act-btn" data-act="logcall">📞 Log Call</button>'
+    + '<button class="act-btn" data-act="logemail">✉️ Log Email</button>'
+    + '<button class="act-btn" data-act="appointment">📅 Appointment</button>'
+    + (emailTo ? '<a class="act-btn" target="_blank" rel="noopener" href="' + gmailUrl + '">✉️ Gmail Compose</a>' : '')
+    + (emailTo ? '<a class="act-btn" target="_blank" rel="noopener" href="' + mailto + '">✉️ Mail App</a>' : '')
+    + (e['Draft Email'] ? '<button class="act-btn" data-act="showdraft">📝 View Draft</button>' : '')
+    + '</div></section>';
+
+  // Web lookup links
+  const nameForSearch = ((e['First Name'] || '') + ' ' + (e['Last Name'] || '')).trim();
+  const locForSearch = ((e['City'] || '') + ' ' + (e['State'] || '')).trim();
+  const spec = (e['Specialty'] || '').split(',')[0].split('>')[0].trim();
+  const googleQ = encodeURIComponent(nameForSearch + ' ' + spec + ' ' + locForSearch);
+  const npiQ = encodeURIComponent(e['HCP NPI'] || '');
+  html += '<section><h3>Look up online</h3>'
+    + '<div class="action-grid">'
+    + '<a class="act-btn ghost" target="_blank" rel="noopener" href="https://www.google.com/search?q=' + googleQ + '">🔍 Google</a>'
+    + '<a class="act-btn ghost" target="_blank" rel="noopener" href="https://www.healthgrades.com/usearch?what=' + encodeURIComponent(nameForSearch) + '&where=' + encodeURIComponent(locForSearch) + '">Healthgrades</a>'
+    + '<a class="act-btn ghost" target="_blank" rel="noopener" href="https://doctor.webmd.com/results?q=' + encodeURIComponent(nameForSearch) + '&location=' + encodeURIComponent(locForSearch) + '">WebMD</a>'
+    + '<a class="act-btn ghost" target="_blank" rel="noopener" href="https://opennpi.com/provider/' + npiQ + '">OpenNPI</a>'
+    + '</div></section>';
+
   html += '<section><h3>Phone</h3>' + phonePill(e).replace(/<a/g, '<a style="display:block;margin-bottom:6px;"') + '</section>';
+
+  // Call history (rounds that already have dates)
+  const callHistory = [];
+  for (let i = 1; i <= 5; i++) {
+    const d = e['Call ' + i + ' Date'];
+    if (d && String(d).trim()) {
+      callHistory.push('<div class="history-item"><div class="history-row"><span class="lbl">Call ' + i + ' · ' + escHtml(d) + '</span><span class="val pill navy">' + escHtml(e['Call ' + i + ' Outcome'] || '—') + '</span></div>'
+        + (e['Call ' + i + ' Notes'] ? '<div class="history-note">' + escHtml(e['Call ' + i + ' Notes']) + '</div>' : '')
+        + '</div>');
+    }
+  }
+  if (callHistory.length) {
+    html += '<section><h3>Call history (' + callHistory.length + ')</h3>' + callHistory.join('') + '</section>';
+  }
+
+  // Email history
+  const emailHistory = [];
+  for (let i = 1; i <= 3; i++) {
+    const d = e['Email ' + i + ' Date'];
+    if (d && String(d).trim()) {
+      emailHistory.push('<div class="history-item"><div class="history-row"><span class="lbl">Email ' + i + ' · ' + escHtml(d) + '</span><span class="val pill navy">' + escHtml(e['Email ' + i + ' Outcome'] || '—') + '</span></div>'
+        + (e['Email ' + i + ' Subject'] ? '<div class="history-note"><strong>' + escHtml(e['Email ' + i + ' Subject']) + '</strong></div>' : '')
+        + (e['Email ' + i + ' Notes'] ? '<div class="history-note">' + escHtml(e['Email ' + i + ' Notes']) + '</div>' : '')
+        + '</div>');
+    }
+  }
+  if (emailHistory.length) {
+    html += '<section><h3>Email history (' + emailHistory.length + ')</h3>' + emailHistory.join('') + '</section>';
+  }
+
+  // Next action / appointment
+  if (e['Next Action'] || e['Next Action Date']) {
+    html += '<section><h3>Next step</h3>'
+      + '<div class="field"><span class="lbl">Action</span><span class="val">' + escHtml(e['Next Action'] || '-') + '</span></div>'
+      + '<div class="field"><span class="lbl">Date</span><span class="val">' + escHtml(e['Next Action Date'] || '-') + '</span></div>'
+      + '</section>';
+  }
+
   html += '<section><h3>Lead</h3>'
     + '<div class="field"><span class="lbl">Target Tier</span><span class="val">' + escHtml(e['Target Tier'] || '') + '</span></div>'
     + '<div class="field"><span class="lbl">Practice Type</span><span class="val">' + escHtml(e['Practice Type'] || '') + '</span></div>'
@@ -374,20 +477,42 @@ function openSheet(npi, mode) {
     + '<div class="field"><span class="lbl">MAC / Microlyte</span><span class="val">' + escHtml(e['MAC Jurisdiction'] || '') + ' / ' + escHtml(e['Microlyte Eligible'] || '') + '</span></div>'
     + '<div class="field"><span class="lbl">Email</span><span class="val">' + escHtml(e['Email'] || '(none)') + '</span></div>'
     + '</section>';
+
   if (e['Target Tier Reason']) {
     html += '<section><h3>Why ' + escHtml(e['Target Tier'] || '') + '</h3><div style="font-size:12px;background:#f7f9fa;padding:10px;border-radius:8px;white-space:pre-wrap;">' + escHtml(e['Target Tier Reason']).replace(/\|/g, '<br>') + '</div></section>';
   }
+
   document.getElementById('sh-body').innerHTML = html;
-  document.getElementById('sh-save').style.display = currentMode === 'log' ? '' : 'none';
-  document.getElementById('sh-close').textContent = currentMode === 'log' ? 'Cancel' : 'Close';
+  const isLog = currentMode === 'logcall' || currentMode === 'logemail' || currentMode === 'appointment';
+  document.getElementById('sh-save').style.display = isLog ? '' : 'none';
+  document.getElementById('sh-close').textContent = isLog ? 'Cancel' : 'Close';
   document.getElementById('sheet').classList.add('show');
   document.getElementById('sheet-bg').classList.add('show');
+  document.getElementById('sh-body').scrollTop = 0;
 
-  // Wire up the date quick-buttons
+  // Wire up action toolbar buttons
+  document.querySelectorAll('.act-btn[data-act]').forEach(b => {
+    b.addEventListener('click', () => {
+      const act = b.dataset.act;
+      if (act === 'showdraft') {
+        const body = (raw['Draft Email'] || '');
+        const subj = (raw['Subject Line'] || '');
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText('Subject: ' + subj + '\n\n' + body).then(() => toast('Draft copied to clipboard'));
+        } else {
+          alert('Subject: ' + subj + '\n\n' + body);
+        }
+        return;
+      }
+      openSheet(npi, act);
+    });
+  });
+
   document.querySelectorAll('.date-row button').forEach(b => {
     b.addEventListener('click', () => {
-      const d = new Date(); d.setDate(d.getDate() + parseInt(b.dataset.d, 10) || 0); d.setHours(12);
-      document.getElementById('f-date').value = d.toISOString().slice(0,10);
+      const d = new Date(); d.setDate(d.getDate() + (parseInt(b.dataset.d, 10) || 0)); d.setHours(12);
+      const target = document.getElementById('f-date') || document.getElementById('f-appt-date');
+      if (target) target.value = d.toISOString().slice(0,10);
     });
   });
 }
@@ -401,28 +526,62 @@ document.getElementById('sh-close').addEventListener('click', closeSheet);
 document.getElementById('sheet-bg').addEventListener('click', closeSheet);
 
 document.getElementById('sh-save').addEventListener('click', () => {
-  if (!currentNpi || currentMode !== 'log') return;
-  const outcome = document.getElementById('f-outcome').value;
-  if (!outcome) { toast('Pick an outcome first', true); return; }
-  const date = document.getElementById('f-date').value || todayIso();
-  const notes = document.getElementById('f-notes').value.trim();
-  const newStatus = document.getElementById('f-status').value;
+  if (!currentNpi) return;
   const raw = ROW_BY_NPI[currentNpi] || {};
   const patch = edits[currentNpi] ? Object.assign({}, edits[currentNpi]) : {};
-  // Find next empty Call slot
-  let slot = 0;
-  for (let i = 1; i <= 5; i++) {
-    const existing = (patch['Call ' + i + ' Date'] !== undefined ? patch['Call ' + i + ' Date'] : raw['Call ' + i + ' Date']) || '';
-    if (!existing.trim()) { slot = i; break; }
+  const fullName = ((raw['First Name'] || '') + ' ' + (raw['Last Name'] || '')).trim();
+
+  if (currentMode === 'logcall') {
+    const outcome = document.getElementById('f-outcome').value;
+    if (!outcome) { toast('Pick an outcome first', true); return; }
+    const date = document.getElementById('f-date').value || todayIso();
+    const notes = document.getElementById('f-notes').value.trim();
+    const newStatus = document.getElementById('f-status').value;
+    let slot = 0;
+    for (let i = 1; i <= 5; i++) {
+      const existing = (patch['Call ' + i + ' Date'] !== undefined ? patch['Call ' + i + ' Date'] : raw['Call ' + i + ' Date']) || '';
+      if (!existing.trim()) { slot = i; break; }
+    }
+    if (!slot) slot = 5;
+    patch['Call ' + slot + ' Date'] = date;
+    patch['Call ' + slot + ' Outcome'] = outcome;
+    if (notes) patch['Call ' + slot + ' Notes'] = notes;
+    if (newStatus) patch['Lead Status'] = newStatus;
+    edits[currentNpi] = patch;
+    localStorage.setItem(LS_KEY, JSON.stringify(edits));
+    toast('Call ' + slot + ' logged for ' + fullName);
+  } else if (currentMode === 'logemail') {
+    const outcome = document.getElementById('f-outcome').value;
+    if (!outcome) { toast('Pick an outcome first', true); return; }
+    const date = document.getElementById('f-date').value || todayIso();
+    const subject = document.getElementById('f-subject').value.trim();
+    const notes = document.getElementById('f-notes').value.trim();
+    const newStatus = document.getElementById('f-status').value;
+    let slot = 0;
+    for (let i = 1; i <= 3; i++) {
+      const existing = (patch['Email ' + i + ' Date'] !== undefined ? patch['Email ' + i + ' Date'] : raw['Email ' + i + ' Date']) || '';
+      if (!existing.trim()) { slot = i; break; }
+    }
+    if (!slot) slot = 3;
+    patch['Email ' + slot + ' Date'] = date;
+    patch['Email ' + slot + ' Outcome'] = outcome;
+    if (subject) patch['Email ' + slot + ' Subject'] = subject;
+    if (notes) patch['Email ' + slot + ' Notes'] = notes;
+    if (newStatus) patch['Lead Status'] = newStatus;
+    edits[currentNpi] = patch;
+    localStorage.setItem(LS_KEY, JSON.stringify(edits));
+    toast('Email ' + slot + ' logged for ' + fullName);
+  } else if (currentMode === 'appointment') {
+    const apptDate = document.getElementById('f-appt-date').value || todayIso();
+    const action = document.getElementById('f-action').value.trim() || 'Meeting/Lunch & Learn';
+    const newStatus = document.getElementById('f-status').value || 'Meeting Booked';
+    patch['Next Action'] = action;
+    patch['Next Action Date'] = apptDate;
+    patch['Lead Status'] = newStatus;
+    edits[currentNpi] = patch;
+    localStorage.setItem(LS_KEY, JSON.stringify(edits));
+    toast('Appointment set for ' + fullName);
   }
-  if (!slot) slot = 5;
-  patch['Call ' + slot + ' Date'] = date;
-  patch['Call ' + slot + ' Outcome'] = outcome;
-  if (notes) patch['Call ' + slot + ' Notes'] = notes;
-  if (newStatus) patch['Lead Status'] = newStatus;
-  edits[currentNpi] = patch;
-  localStorage.setItem(LS_KEY, JSON.stringify(edits));
-  toast('Call ' + slot + ' logged for ' + ((raw['First Name'] || '') + ' ' + (raw['Last Name'] || '')).trim());
   closeSheet();
   render();
 });
