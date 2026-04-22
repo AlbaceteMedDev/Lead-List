@@ -405,16 +405,22 @@ function openSheet(npi, mode) {
   const emailTo = (e['Email'] || '').trim();
   const subj = encodeURIComponent(e['Subject Line'] || '');
   const body = encodeURIComponent(e['Draft Email'] || '');
-  const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(emailTo) + '&su=' + subj + '&body=' + body;
+  // Gmail app URL schemes:
+  // - iOS Gmail app: googlegmail://co?to=...&subject=...&body=...
+  // - Android: mailto: opens Gmail if set as default mail handler.
+  // Intent URL also works on Android Chrome to force Gmail:
+  //   intent://co/#Intent;scheme=googlegmail;package=com.google.android.gm;...;end
+  // Simpler: send both as candidates via a click handler that tries the app scheme first.
+  const gmailAppUrl = 'googlegmail://co?to=' + encodeURIComponent(emailTo) + '&subject=' + subj + '&body=' + body;
+  const gmailWebUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(emailTo) + '&su=' + subj + '&body=' + body;
   const mailto = 'mailto:' + encodeURIComponent(emailTo) + '?subject=' + subj + '&body=' + body;
   html += '<section><h3>Actions</h3>'
     + '<div class="action-grid">'
     + '<button class="act-btn" data-act="logcall">📞 Log Call</button>'
     + '<button class="act-btn" data-act="logemail">✉️ Log Email</button>'
     + '<button class="act-btn" data-act="appointment">📅 Appointment</button>'
-    + (emailTo ? '<a class="act-btn" target="_blank" rel="noopener" href="' + gmailUrl + '">✉️ Gmail Compose</a>' : '')
-    + (emailTo ? '<a class="act-btn" target="_blank" rel="noopener" href="' + mailto + '">✉️ Mail App</a>' : '')
-    + (e['Draft Email'] ? '<button class="act-btn" data-act="showdraft">📝 View Draft</button>' : '')
+    + (emailTo ? '<button class="act-btn" data-act="gmail" data-app="' + escHtml(gmailAppUrl) + '" data-web="' + escHtml(gmailWebUrl) + '" data-mailto="' + escHtml(mailto) + '">✉️ Open in Gmail</button>' : '')
+    + (e['Draft Email'] ? '<button class="act-btn" data-act="showdraft">📝 Copy Draft</button>' : '')
     + '</div></section>';
 
   // Web lookup links
@@ -502,6 +508,25 @@ function openSheet(npi, mode) {
         } else {
           alert('Subject: ' + subj + '\n\n' + body);
         }
+        return;
+      }
+      if (act === 'gmail') {
+        // Prefer the installed Gmail app. iOS Gmail registers googlegmail://,
+        // Android Gmail handles mailto: when set as default mail handler.
+        // Strategy: try the Gmail app scheme (or mailto on Android), and after
+        // a short delay fall back to the Gmail web composer so the user still
+        // gets to compose if no app is installed.
+        const appUrl = b.dataset.app;
+        const webUrl = b.dataset.web;
+        const mailtoUrl = b.dataset.mailto;
+        const ua = navigator.userAgent || '';
+        const isIOS = /iPad|iPhone|iPod/.test(ua);
+        const isAndroid = /Android/.test(ua);
+        const primary = isIOS ? appUrl : (isAndroid ? mailtoUrl : webUrl);
+        // Fire primary; if the browser still has focus after 1.2s, open web as fallback
+        const fallbackTimer = setTimeout(() => { window.open(webUrl, '_blank', 'noopener'); }, 1200);
+        window.addEventListener('blur', () => clearTimeout(fallbackTimer), { once: true });
+        window.location.href = primary;
         return;
       }
       openSheet(npi, act);
