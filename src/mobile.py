@@ -52,7 +52,7 @@ _HTML_TEMPLATE = r"""<!doctype html>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior-y: contain; }
   body { font-family: -apple-system, Segoe UI, Arial, sans-serif; color: var(--ink); background: var(--bg); font-size: 15px; line-height: 1.35; }
-  header { position: sticky; top: 0; z-index: 5; background: var(--navy); color: #fff; padding: 12px 14px calc(12px + env(safe-area-inset-top)) 14px; padding-top: calc(12px + env(safe-area-inset-top)); }
+  header { background: var(--navy); color: #fff; padding: 12px 14px 12px 14px; padding-top: calc(12px + env(safe-area-inset-top)); }
   header h1 { margin: 0; font-size: 16px; font-weight: 600; }
   header .meta { font-size: 11px; color: #d5dbe1; margin-top: 2px; }
   header .actions { display: flex; gap: 6px; margin-top: 8px; }
